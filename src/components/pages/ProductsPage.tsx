@@ -18,7 +18,8 @@ import {
   Search,
   Shield,
   FileText,
-  Cloud
+  Cloud,
+  RefreshCw
 } from 'lucide-react';
 import { IntegrationProduct } from '../../types';
 import { PRODUCT_CATEGORIES } from '../../constants';
@@ -177,7 +178,7 @@ export function ProductsPage({ onStartIntegration }: ProductsPageProps) {
                   placeholder="Search products, descriptions, or categories..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  {(filteredProducts || []).length} product{(filteredProducts || []).length !== 1 ? 's' : ''}
+                  className="pl-10"
                 />
               </div>
               
@@ -196,6 +197,9 @@ export function ProductsPage({ onStartIntegration }: ProductsPageProps) {
             </div>
             
             <div className="flex items-center space-x-2">
+              <Badge variant="outline">
+                {(filteredProducts || []).length} product{(filteredProducts || []).length !== 1 ? 's' : ''}
+              </Badge>
               <Button variant="outline" onClick={refetch} disabled={loading}>
                 <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
                 Refresh
@@ -418,27 +422,27 @@ export function ProductsPage({ onStartIntegration }: ProductsPageProps) {
                     <div className="flex items-start space-x-4 mb-4">
                       <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-gray-500 to-gray-600 rounded-xl shadow-md group-hover:scale-110 transition-transform duration-300">
                         <IconComponent className="w-6 h-6 text-white" />
-                            <h3 className="font-semibold text-lg mb-1">{product.name || 'Unknown Product'}</h3>
-                            <p className="text-sm text-muted-foreground mb-2">{product.provider || 'Unknown Provider'}</p>
-                        <h3 className="font-semibold text-lg mb-1">{product.name}</h3>
-                              {product.category || 'Uncategorized'}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-lg mb-1">{product.name || 'Unknown Product'}</h3>
+                        <p className="text-sm text-muted-foreground mb-2">{product.provider || 'Unknown Provider'}</p>
                         <Badge variant="outline" className="text-xs">
-                          {product.category}
+                          {product.category || 'Uncategorized'}
                         </Badge>
                       </div>
-                        <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{product.description || 'No description available'}</p>
+                    </div>
                     
-                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{product.description}</p>
-                {(filteredProducts || []).map((product) => {
+                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{product.description || 'No description available'}</p>
+                    
                     <div className="space-y-3 mb-4">
                       {product.rating && (
                         <div className="flex items-center space-x-2">
-                      {(product.status || '') === 'Integrated' && (
+                          <div className="flex items-center space-x-1">
                             <Star className="w-4 h-4 text-yellow-500 fill-current" />
                             <span className="text-sm font-medium">{product.rating}</span>
-                              <span className="text-sm text-muted-foreground">{product.users || '0'} users</span>
+                          </div>
                           <Separator orientation="vertical" className="h-4" />
-                          <span className="text-sm text-muted-foreground">{product.users} users</span>
+                          <span className="text-sm text-muted-foreground">{product.users || '0'} users</span>
                         </div>
                       )}
                       
@@ -451,14 +455,14 @@ export function ProductsPage({ onStartIntegration }: ProductsPageProps) {
                     </div>
                     
                     <Button 
-                          disabled={(product.status || '') !== 'Available'}
+                      className="w-full shadow-sm hover:shadow-md group-hover:bg-primary/90"
+                      disabled={(product.status || '') !== 'Available'}
                       onClick={() => onStartIntegration(product)}
-                          {(product.status || '') === 'Integrated' ? (
                     >
-                      {product.status === 'Integrated' ? (
+                      {(product.status || '') === 'Integrated' ? (
                         <>
                           <CheckCircle className="w-4 h-4 mr-2" />
-                      {product.isPopular && (product.status || '') !== 'Integrated' && (
+                          Already Integrated
                         </>
                       ) : (
                         <>
