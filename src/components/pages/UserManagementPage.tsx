@@ -1,13 +1,13 @@
 import React, { useState, useMemo } from 'react';
 import { useApi } from '../../shared/hooks/useApi';
 import { apiService } from '../../shared/services/api';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
-import { Input } from '../ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../shared/components/ui/card';
+import { Button } from '../../shared/components/ui/button';
+import { Badge } from '../../shared/components/ui/badge';
+import { Input } from '../../shared/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../shared/components/ui/select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../shared/components/ui/table';
+import { Avatar, AvatarFallback, AvatarImage } from '../../shared/components/ui/avatar';
 import {
   Users,
   Edit,
@@ -17,8 +17,8 @@ import {
   Filter,
   RefreshCw
 } from 'lucide-react';
-import { User } from '../../types';
-import { getRoleBadgeColor, getInitials } from '../../utils';
+import { User } from '../../shared/types';
+import { getRoleBadgeColor, getInitials } from '../../shared/utils';
 
 export function UserManagementPage() {
   // State management

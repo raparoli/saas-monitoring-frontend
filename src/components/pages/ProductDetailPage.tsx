@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
-import { Progress } from '../ui/progress';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../shared/components/ui/card';
+import { Button } from '../../shared/components/ui/button';
+import { Badge } from '../../shared/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../shared/components/ui/tabs';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../shared/components/ui/table';
+import { Progress } from '../../shared/components/ui/progress';
 import { ArrowLeft, Cloud, Shield, Calendar, Users, Activity, AlertTriangle } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { ProductDetail } from '../../shared/types';

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from '../ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
-import { TooltipProvider } from '../ui/tooltip';
+import { Button } from '../../shared/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../shared/components/ui/tabs';
+import { TooltipProvider } from '../../shared/components/ui/tooltip';
 import { CustomerUsageBreakdownPage } from './CustomerUsageBreakdownPage';
 import { EnhancedCustomerDrawer } from '../acronis/EnhancedCustomerDrawer';
 import { CustomerDetailDrawer } from '../acronis/CustomerDetailDrawer';

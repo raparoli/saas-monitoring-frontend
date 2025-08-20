@@ -1,15 +1,15 @@
 import React, { useState, useMemo } from 'react';
 import { useApi } from '../../shared/hooks/useApi';
 import { apiService } from '../../shared/services/api';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
-import { Input } from '../ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../ui/dialog';
-import { ScrollArea } from '../ui/scroll-area';
-import { Separator } from '../ui/separator';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../shared/components/ui/card';
+import { Button } from '../../shared/components/ui/button';
+import { Badge } from '../../shared/components/ui/badge';
+import { Input } from '../../shared/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../shared/components/ui/select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../shared/components/ui/table';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../../shared/components/ui/dialog';
+import { ScrollArea } from '../../shared/components/ui/scroll-area';
+import { Separator } from '../../shared/components/ui/separator';
 import {
   Mail,
   CheckCircle,
@@ -27,14 +27,14 @@ import {
   Filter,
   RefreshCw
 } from 'lucide-react';
-import { AlertEmailLog } from '../../types';
+import { AlertEmailLog } from '../../shared/types';
 import { 
   formatDateTime,
   getSeverityBadgeVariant,
   getEmailStatusColor,
   getProductBadgeColor
-} from '../../utils';
-import { getStatusIcon } from '../../lib/icons';
+} from '../../shared/utils';
+import { getStatusIcon } from '../../shared/utils/iconHelpers';
 
 export function AlertManagementPage() {
   // State management
