@@ -62,6 +62,18 @@ import {
   Area,
   AreaChart
 } from 'recharts';
+import { 
+  formatStorageGB, 
+  formatDate, 
+  getDaysUntilRenewal
+} from '../../shared/utils/formatters';
+import {
+  getUsagePercentage,
+  getStatusBadgeVariant,
+  getUsageBadgeVariant,
+  getComplexityColor,
+  getProductGradient
+} from '../../shared/utils/styleHelpers';
 
 interface CustomerUsageBreakdownPageProps {
   onBack: () => void;

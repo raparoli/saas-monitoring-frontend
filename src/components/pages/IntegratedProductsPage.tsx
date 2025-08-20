@@ -28,12 +28,12 @@ import {
   AlertTriangle,
   RefreshCw
 } from 'lucide-react';
-import { ProductDetail, IntegrationProduct } from '../../types';
-import { AVAILABLE_PRODUCTS } from '../../constants';
+import { ProductDetail, IntegrationProduct } from '../../shared/types';
+import { PRODUCT_CATEGORIES } from '../../shared/constants';
 import { 
-  getProductIcon, 
-  getCategoryIcon 
-} from '../../lib/icons';
+  getProductIcon,
+  getCategoryIcon
+} from '../../shared/utils/iconHelpers';
 import { 
   formatDate, 
   getDaysUntilRenewal, 
@@ -42,7 +42,7 @@ import {
   getUsageBadgeVariant,
   getComplexityColor,
   getProductGradient
-} from '../../utils';
+} from '../../shared/utils';
 
 interface IntegratedProductsPageProps {
   onViewDetails: (page: 'product-detail', product: ProductDetail) => void;

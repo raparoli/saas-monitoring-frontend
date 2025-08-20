@@ -9,6 +9,15 @@ import { ArrowLeft, Cloud, Shield, Calendar, Users, Activity, AlertTriangle } fr
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { ProductDetail } from '../../shared/types';
 
+// Helper function for severity badge variant
+function getSeverityBadgeVariant(severity: string) {
+  switch (severity) {
+    case 'warning': return 'secondary';
+    case 'info': return 'default';
+    default: return 'secondary';
+  }
+}
+
 interface ProductDetailPageProps {
   product: ProductDetail;
   onBack: () => void;
