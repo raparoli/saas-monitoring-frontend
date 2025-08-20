@@ -14,7 +14,7 @@ import { Page, ProductDetail, IntegrationProduct } from './shared/types';
 
 export default function App() {
   const { isAuthenticated, user, isLoading, login, logout } = useAuth();
-  const [currentPage, setCurrentPage] = useState<Page>('login');
+  const [currentPage, setCurrentPage] = useState<Page>('dashboard');
   const [selectedProduct, setSelectedProduct] = useState<ProductDetail | null>(null);
   const [integrationProduct, setIntegrationProduct] = useState<IntegrationProduct | null>(null);
   const [showIntegrationWindow, setShowIntegrationWindow] = useState(false);
