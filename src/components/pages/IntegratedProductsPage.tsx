@@ -93,11 +93,11 @@ export function IntegratedProductsPage({ onViewDetails, onAcronisDetail, onStart
   };
 
   const filteredProducts = (actualIntegratedProducts || []).filter(product => {
-    if (!product || typeof product !== 'object') return false;
+    if (!product || typeof product !== 'object' || product === null) return false;
     return (product.name || '').toLowerCase().includes((searchTerm || '').toLowerCase());
   });
 
-  const availableProducts = safeAvailableProductsData.filter(p => p && typeof p === 'object' && (p.status || '') === 'Available');
+  const availableProducts = safeAvailableProductsData.filter(p => p && typeof p === 'object' && p !== null && (p.status || '') === 'Available');
 
   const getStatusBadge = (status: string) => {
     switch (status || '') {

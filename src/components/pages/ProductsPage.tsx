@@ -40,7 +40,7 @@ export function ProductsPage({ onStartIntegration }: ProductsPageProps) {
   );
 
   // Ensure products is always an array
-  const safeProducts = Array.isArray(products) ? products : [];
+  const safeProducts = (products && Array.isArray(products)) ? products : [];
 
   const getComplexityBadgeColor = (complexity: string) => {
     switch (complexity) {
@@ -67,7 +67,7 @@ export function ProductsPage({ onStartIntegration }: ProductsPageProps) {
   };
 
   const filteredProducts = safeProducts.filter(product => {
-    if (!product || typeof product !== 'object') return false;
+    if (!product || typeof product !== 'object' || product === null) return false;
     const matchesSearch = (product.name || '').toLowerCase().includes((searchTerm || '').toLowerCase()) ||
                          (product.description || '').toLowerCase().includes((searchTerm || '').toLowerCase()) ||
                          (product.category || '').toLowerCase().includes((searchTerm || '').toLowerCase());
@@ -75,9 +75,9 @@ export function ProductsPage({ onStartIntegration }: ProductsPageProps) {
     return matchesSearch && matchesCategory;
   });
 
-  const availableProducts = safeProducts.filter(p => p && typeof p === 'object' && (p.status || '') === 'Available');
-  const integratedProducts = safeProducts.filter(p => p && typeof p === 'object' && (p.status || '') === 'Integrated');
-  const recommendedProducts = safeProducts.filter(p => p && typeof p === 'object' && p.isRecommended && (p.status || '') === 'Available');
+  const availableProducts = safeProducts.filter(p => p && typeof p === 'object' && p !== null && (p.status || '') === 'Available');
+  const integratedProducts = safeProducts.filter(p => p && typeof p === 'object' && p !== null && (p.status || '') === 'Integrated');
+  const recommendedProducts = safeProducts.filter(p => p && typeof p === 'object' && p !== null && p.isRecommended && (p.status || '') === 'Available');
 
   return (
     <div className="flex-1 p-6 space-y-8 bg-gradient-to-br from-slate-50 via-white to-purple-50 min-h-screen">
