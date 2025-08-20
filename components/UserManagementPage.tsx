@@ -7,23 +7,10 @@ import { SearchAndFilter } from '../src/components/common/SearchAndFilter';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
-import { Input } from './ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from './ui/dialog';
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from './ui/sheet';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from './ui/alert-dialog';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { Label } from './ui/label';
-import { Switch } from './ui/switch';
-import { Checkbox } from './ui/checkbox';
-import { ScrollArea } from './ui/scroll-area';
-import { Separator } from './ui/separator';
-import { toast } from 'sonner';
 import {
   Users,
-  UserPlus,
-  Eye,
   Edit,
   Trash2,
 } from 'lucide-react';

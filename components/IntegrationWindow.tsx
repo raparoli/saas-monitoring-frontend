@@ -9,7 +9,6 @@ import { Label } from './ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Progress } from './ui/progress';
 import { Badge } from './ui/badge';
-import { Textarea } from './ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Checkbox } from './ui/checkbox';
 import { 
@@ -17,13 +16,9 @@ import {
   ArrowRight, 
   ArrowLeft, 
   CheckCircle, 
-  AlertCircle, 
   Loader2,
   Key,
-  Settings,
   Shield,
-  Cloud,
-  HardDrive,
   Info
 } from 'lucide-react';
 

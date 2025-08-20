@@ -1,1 +1,0 @@
-export { IntegrationWindow } from '../../../components/IntegrationWindow';

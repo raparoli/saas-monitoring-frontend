@@ -10,8 +10,6 @@ import { SearchAndFilter } from '../src/components/common/SearchAndFilter';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
-import { Input } from './ui/input';
 import { Progress } from './ui/progress';
 import { Separator } from './ui/separator';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
@@ -19,7 +17,6 @@ import {
   Eye, 
   Calendar, 
   Cloud, 
-  AlertTriangle,
   CheckCircle,
   Star,
   Clock,
@@ -79,6 +76,15 @@ export function IntegratedProductsPage({ onViewDetails, onAcronisDetail, onStart
   );
 
   const availableProducts = AVAILABLE_PRODUCTS.filter(p => p.status === 'Available');
+
+  const getComplexityColor = (complexity: string) => {
+    switch (complexity) {
+      case 'Simple': return 'bg-green-100 text-green-800';
+      case 'Moderate': return 'bg-yellow-100 text-yellow-800';
+      case 'Advanced': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
 
   return (
     <TooltipProvider>

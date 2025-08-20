@@ -1,5 +1,6 @@
 import React from 'react';
 import { RefreshCw } from 'lucide-react';
+import { cn } from '../../../components/ui/utils';
 
 interface LoadingSpinnerProps {
   message?: string;

@@ -7,20 +7,15 @@ import { formatDateTime } from '../src/utils/formatters';
 import { PageHeader } from '../src/components/common/PageHeader';
 import { StatCard } from '../src/components/common/StatCard';
 import { SearchAndFilter } from '../src/components/common/SearchAndFilter';
-import { DataTable } from '../src/components/common/DataTable';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
-import { Input } from './ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/dialog';
 import { ScrollArea } from './ui/scroll-area';
 import { Separator } from './ui/separator';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import {
   Mail,
-  AlertTriangle,
   CheckCircle,
   XCircle,
   Eye,

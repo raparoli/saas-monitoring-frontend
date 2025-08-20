@@ -1,4 +1,5 @@
 import React from 'react';
+import { cn } from '../../../components/ui/utils';
 
 interface PageHeaderProps {
   icon: React.ComponentType<{ className?: string }>;

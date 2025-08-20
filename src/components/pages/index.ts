@@ -1,9 +1,0 @@
-export { LoginPage } from '../../../components/LoginPage';
-export { Dashboard } from '../../../components/Dashboard';
-export { ProductsPage } from '../../../components/ProductsPage';
-export { IntegratedProductsPage } from '../../../components/IntegratedProductsPage';
-export { ProductDetailPage } from '../../../components/ProductDetailPage';
-export { AcronisDetailPage } from '../../../components/AcronisDetailPage';
-export { AlertManagementPage } from '../../../components/AlertManagementPage';
-export { UserManagementPage } from '../../../components/UserManagementPage';
-export { CustomerUsageBreakdownPage } from '../../../components/CustomerUsageBreakdownPage';
