@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useApi } from '../../../shared/hooks/useApi';
-import { apiService } from '../../../shared/services/api';
+import { usersService } from '../services/usersService';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../shared/components/ui/card';
 import { Button } from '../../../shared/components/ui/button';
 import { Badge } from '../../../shared/components/ui/badge';
@@ -28,7 +28,7 @@ export function UserManagementPage() {
 
   // API integration
   const { data: users = [], loading, error, refetch } = useApi(
-    apiService.getUsers,
+    usersService.getUsers,
     { immediate: true }
   );
 

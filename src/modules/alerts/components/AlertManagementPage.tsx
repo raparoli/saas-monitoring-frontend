@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useApi } from '../../../shared/hooks/useApi';
-import { apiService } from '../../../shared/services/api';
+import { alertsService } from '../services/alertsService';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../shared/components/ui/card';
 import { Button } from '../../../shared/components/ui/button';
 import { Badge } from '../../../shared/components/ui/badge';
@@ -50,7 +50,7 @@ export function AlertManagementPage() {
 
   // API integration
   const { data: alertsData, loading, error, refetch } = useApi(
-    apiService.getAlertEmailLogs,
+    alertsService.getAlertEmailLogs,
     { immediate: true }
   );
 
