@@ -1,25 +1,85 @@
 import React, { useState, useMemo } from 'react';
-import { MOCK_USERS, AVAILABLE_PRODUCTS } from '../src/data/mockUserData';
-import { User } from '../src/types';
-import { getRoleBadgeColor } from '../src/utils/badge-variants';
-import { getInitials, formatDate, formatDateTime } from '../src/utils/formatters';
-import { SearchAndFilter } from '../src/components/common/SearchAndFilter';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
+import { Input } from './ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import {
   Users,
   Edit,
   Trash2,
+  UserPlus,
+  Search,
+  Filter,
+  RefreshCw
 } from 'lucide-react';
 
-interface InviteUserForm {
+interface User {
+  id: string;
+  name: string;
   email: string;
   role: 'Admin' | 'Analyst' | 'Viewer';
+  status: 'Active' | 'Suspended';
+  lastActive: string;
+  createdOn: string;
   assignedProducts: string[];
+  avatar?: string;
 }
+
+const MOCK_USERS: User[] = [
+  {
+    id: '1',
+    name: 'John Doe',
+    email: 'john.doe@company.com',
+    role: 'Admin',
+    status: 'Active',
+    lastActive: '2024-01-15T14:30:00Z',
+    createdOn: '2023-06-15T09:00:00Z',
+    assignedProducts: ['Acronis', 'Microsoft', 'Bitdefender']
+  },
+  {
+    id: '2',
+    name: 'Sarah Wilson',
+    email: 'sarah.wilson@company.com',
+    role: 'Analyst',
+    status: 'Active',
+    lastActive: '2024-01-15T12:45:00Z',
+    createdOn: '2023-08-22T10:30:00Z',
+    assignedProducts: ['Acronis', 'Microsoft']
+  },
+  {
+    id: '3',
+    name: 'Michael Chen',
+    email: 'michael.chen@company.com',
+    role: 'Viewer',
+    status: 'Active',
+    lastActive: '2024-01-14T16:20:00Z',
+    createdOn: '2023-11-10T14:15:00Z',
+    assignedProducts: ['Acronis']
+  },
+  {
+    id: '4',
+    name: 'Emily Rodriguez',
+    email: 'emily.rodriguez@company.com',
+    role: 'Analyst',
+    status: 'Suspended',
+    lastActive: '2024-01-10T11:30:00Z',
+    createdOn: '2023-09-05T13:45:00Z',
+    assignedProducts: ['Microsoft', 'Bitdefender']
+  },
+  {
+    id: '5',
+    name: 'David Thompson',
+    email: 'david.thompson@company.com',
+    role: 'Viewer',
+    status: 'Active',
+    lastActive: '2024-01-15T08:15:00Z',
+    createdOn: '2023-12-01T16:00:00Z',
+    assignedProducts: ['Bitdefender']
+  }
+];
 
 export function UserManagementPage() {
   // State management
@@ -27,23 +87,19 @@ export function UserManagementPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('All');
   const [statusFilter, setStatusFilter] = useState('All');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [userToRemove, setUserToRemove] = useState<User | null>(null);
 
-  // Modal states
-  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
-  const [isUserDrawerOpen, setIsUserDrawerOpen] = useState(false);
-  const [isRemoveDialogOpen, setIsRemoveDialogOpen] = useState(false);
+  const getRoleBadgeColor = (role: string) => {
+    switch (role) {
+      case 'Admin': return 'bg-red-100 text-red-800';
+      case 'Analyst': return 'bg-blue-100 text-blue-800';
+      case 'Viewer': return 'bg-green-100 text-green-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
 
-  // Form states
-  const [inviteForm, setInviteForm] = useState<InviteUserForm>({
-    email: '',
-    role: 'Viewer',
-    assignedProducts: []
-  });
-
-  const itemsPerPage = 25;
+  const getInitials = (name: string) => {
+    return name.split(' ').map(n => n[0]).join('').toUpperCase();
+  };
 
   // Filtered users
   const filteredUsers = useMemo(() => {
@@ -59,75 +115,10 @@ export function UserManagementPage() {
     });
   }, [users, searchTerm, roleFilter, statusFilter]);
 
-  const handleInviteUser = () => {
-    if (!inviteForm.email) {
-      toast.error('Email is required');
-      return;
-    }
-
-    // Mock invite logic
-    const newUser: User = {
-      id: Date.now().toString(),
-      name: inviteForm.email.split('@')[0],
-      email: inviteForm.email,
-      role: inviteForm.role,
-      status: 'Active',
-      lastActive: new Date().toISOString(),
-      createdOn: new Date().toISOString(),
-      assignedProducts: inviteForm.assignedProducts
-    };
-
-    setUsers([...users, newUser]);
-    setIsInviteModalOpen(false);
-    setInviteForm({
-      email: '',
-      role: 'Viewer',
-      assignedProducts: []
-    });
-    
-    toast.success('Invite sent successfully');
-  };
-
-  const handleViewEditUser = (user: User) => {
-    setSelectedUser({ ...user });
-    setIsUserDrawerOpen(true);
-  };
-
-  const handleSaveUser = () => {
-    if (!selectedUser) return;
-
-    setUsers(users.map(user => 
-      user.id === selectedUser.id ? selectedUser : user
-    ));
-    
-    setIsUserDrawerOpen(false);
-    toast.success('User updated successfully');
-  };
-
-  const handleToggleUserStatus = (userId: string) => {
-    setUsers(users.map(user => 
-      user.id === userId 
-        ? { ...user, status: user.status === 'Active' ? 'Suspended' : 'Active' }
-        : user
-    ));
-  };
-
-  const handleRemoveUser = (user: User) => {
-    setUserToRemove(user);
-    setIsRemoveDialogOpen(true);
-  };
-
-  const confirmRemoveUser = () => {
-    if (!userToRemove) return;
-    
-    setUsers(users.filter(user => user.id !== userToRemove.id));
-    setIsRemoveDialogOpen(false);
-    setUserToRemove(null);
-    toast.success('User removed successfully');
-  };
-
-  const handleResetPassword = () => {
-    toast.success('Password reset email sent');
+  const handleResetFilters = () => {
+    setSearchTerm('');
+    setRoleFilter('All');
+    setStatusFilter('All');
   };
 
   return (
@@ -150,37 +141,65 @@ export function UserManagementPage() {
       </div>
 
       {/* Filters */}
-      <SearchAndFilter
-        searchValue={searchTerm}
-        onSearchChange={setSearchTerm}
-        searchPlaceholder="Search by name or email..."
-        filters={[
-          {
-            value: roleFilter,
-            onChange: setRoleFilter,
-            placeholder: "Role",
-            options: [
-              { value: 'All', label: 'All Roles' },
-              { value: 'Admin', label: 'Admin' },
-              { value: 'Analyst', label: 'Analyst' },
-              { value: 'Viewer', label: 'Viewer' }
-            ]
-          },
-          {
-            value: statusFilter,
-            onChange: setStatusFilter,
-            placeholder: "Status",
-            options: [
-              { value: 'All', label: 'All Status' },
-              { value: 'Active', label: 'Active' },
-              { value: 'Suspended', label: 'Suspended' }
-            ]
-          }
-        ]}
-      />
+      <Card className="border-0 shadow-lg mb-6">
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Filter className="w-5 h-5" />
+            <span>Filter Controls</span>
+          </CardTitle>
+          <CardDescription>
+            Filter and search through data
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0 lg:space-x-4">
+            <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3 flex-1">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search by name or email..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 bg-white shadow-sm"
+                />
+              </div>
+              
+              <Select value={roleFilter} onValueChange={setRoleFilter}>
+                <SelectTrigger className="w-full sm:w-48 bg-white shadow-sm">
+                  <SelectValue placeholder="Role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="All">All Roles</SelectItem>
+                  <SelectItem value="Admin">Admin</SelectItem>
+                  <SelectItem value="Analyst">Analyst</SelectItem>
+                  <SelectItem value="Viewer">Viewer</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-full sm:w-48 bg-white shadow-sm">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="All">All Status</SelectItem>
+                  <SelectItem value="Active">Active</SelectItem>
+                  <SelectItem value="Suspended">Suspended</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <Button variant="outline" onClick={handleResetFilters}>
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Reset
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Users Table */}
-      <Card className="mt-6 border bg-white">
+      <Card className="border bg-white">
         <CardHeader>
           <CardTitle className="text-base font-medium">
             Users ({filteredUsers.length})

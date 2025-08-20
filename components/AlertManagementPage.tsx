@@ -1,15 +1,9 @@
 import React, { useState, useMemo } from 'react';
-import { MOCK_ALERT_EMAIL_LOGS } from '../src/data/mockAlertData';
-import { AlertEmailLog } from '../src/types';
-import { getSeverityBadgeVariant, getEmailStatusColor, getProductBadgeColor } from '../src/utils/badge-variants';
-import { getStatusIcon } from '../src/utils/icons';
-import { formatDateTime } from '../src/utils/formatters';
-import { PageHeader } from '../src/components/common/PageHeader';
-import { StatCard } from '../src/components/common/StatCard';
-import { SearchAndFilter } from '../src/components/common/SearchAndFilter';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
+import { Input } from './ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/dialog';
 import { ScrollArea } from './ui/scroll-area';
@@ -25,8 +19,116 @@ import {
   MailCheck,
   AlertCircle,
   TrendingUp,
-  BarChart3
+  BarChart3,
+  AlertTriangle,
+  Search,
+  Filter,
+  RefreshCw
 } from 'lucide-react';
+
+interface AlertEmailLog {
+  id: string;
+  alertId: string;
+  productName: string;
+  severity: 'Critical' | 'Warning' | 'Error' | 'Info';
+  category: string;
+  alertType: string;
+  customerName: string;
+  customerEmail: string;
+  resourceName: string;
+  emailSentAt: string;
+  emailStatus: 'Sent' | 'Failed' | 'Pending';
+  message: string;
+  planName: string;
+  deliveryAttempts: number;
+  lastAttempt?: string;
+  errorMessage?: string;
+}
+
+const MOCK_ALERT_EMAIL_LOGS: AlertEmailLog[] = [
+  {
+    id: '1',
+    alertId: 'A0B6A95F',
+    productName: 'Acronis',
+    severity: 'Critical',
+    category: 'Backup',
+    alertType: 'BackupFailed',
+    customerName: 'Taurus Group',
+    customerEmail: 'admin@taurusgroup.com',
+    resourceName: 'DC-GPS.rasasigps.ae',
+    emailSentAt: '2024-01-15T14:30:00Z',
+    emailStatus: 'Sent',
+    message: 'Backup operation failed for critical server',
+    planName: 'Enterprise Backup Plan',
+    deliveryAttempts: 1
+  },
+  {
+    id: '2',
+    alertId: 'B1C7D83A',
+    productName: 'Microsoft',
+    severity: 'Warning',
+    category: 'Email Security',
+    alertType: 'MalwareDetected',
+    customerName: 'Global Industries',
+    customerEmail: 'security@globalindustries.com',
+    resourceName: 'MAIL-SVR-01',
+    emailSentAt: '2024-01-15T13:45:00Z',
+    emailStatus: 'Failed',
+    message: 'Malware detected in incoming email',
+    planName: 'Email Security Pro',
+    deliveryAttempts: 3,
+    lastAttempt: '2024-01-15T15:20:00Z',
+    errorMessage: 'SMTP server connection timeout'
+  },
+  {
+    id: '3',
+    alertId: 'C2D8E94B',
+    productName: 'Bitdefender',
+    severity: 'Error',
+    category: 'System',
+    alertType: 'StorageFull',
+    customerName: 'Tech Solutions Ltd',
+    customerEmail: 'it@techsolutions.com',
+    resourceName: 'STORAGE-CLUSTER-01',
+    emailSentAt: '2024-01-15T12:15:00Z',
+    emailStatus: 'Sent',
+    message: 'Storage capacity at 95% - immediate attention required',
+    planName: 'Infrastructure Monitor',
+    deliveryAttempts: 1
+  },
+  {
+    id: '4',
+    alertId: 'D3E9F05C',
+    productName: 'Zoho',
+    severity: 'Info',
+    category: 'Licensing',
+    alertType: 'LicenseExpiring',
+    customerName: 'Startup Ventures',
+    customerEmail: 'admin@startupventures.com',
+    resourceName: 'LICENSE-SERVER',
+    emailSentAt: '2024-01-15T11:00:00Z',
+    emailStatus: 'Pending',
+    message: 'License expires in 30 days - renewal required',
+    planName: 'Standard License',
+    deliveryAttempts: 0
+  },
+  {
+    id: '5',
+    alertId: 'E4F0G16D',
+    productName: 'Acronis',
+    severity: 'Critical',
+    category: 'EDR',
+    alertType: 'ThreatDetected',
+    customerName: 'Financial Corp',
+    customerEmail: 'security@financialcorp.com',
+    resourceName: 'WORKSTATION-045',
+    emailSentAt: '2024-01-15T10:30:00Z',
+    emailStatus: 'Sent',
+    message: 'Advanced persistent threat detected on endpoint',
+    planName: 'EDR Advanced',
+    deliveryAttempts: 1
+  }
+];
 
 export function AlertManagementPage() {
   // State management
@@ -39,9 +141,60 @@ export function AlertManagementPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedAlert, setSelectedAlert] = useState<AlertEmailLog | null>(null);
   const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('table');
 
   const itemsPerPage = 10;
+
+  const getSeverityBadgeVariant = (severity: string) => {
+    switch (severity.toLowerCase()) {
+      case 'critical':
+      case 'error':
+        return 'destructive';
+      case 'warning':
+        return 'secondary';
+      case 'info':
+        return 'default';
+      default:
+        return 'secondary';
+    }
+  };
+
+  const getEmailStatusColor = (status: string) => {
+    switch (status) {
+      case 'Sent': return 'bg-green-100 text-green-800';
+      case 'Failed': return 'bg-red-100 text-red-800';
+      case 'Pending': return 'bg-yellow-100 text-yellow-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const getProductBadgeColor = (product: string) => {
+    switch (product) {
+      case 'Acronis': return 'bg-blue-100 text-blue-800';
+      case 'Microsoft': return 'bg-green-100 text-green-800';
+      case 'Bitdefender': return 'bg-orange-100 text-orange-800';
+      case 'Zoho': return 'bg-purple-100 text-purple-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'Sent': return CheckCircle;
+      case 'Failed': return XCircle;
+      case 'Pending': return AlertCircle;
+      default: return AlertCircle;
+    }
+  };
+
+  const formatDateTime = (dateString: string) => {
+    return new Date(dateString).toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
 
   // Filtered data
   const filteredAlerts = useMemo(() => {
@@ -121,115 +274,182 @@ export function AlertManagementPage() {
   return (
     <div className="flex-1 p-6 space-y-8 bg-gradient-to-br from-slate-50 via-white to-blue-50 min-h-screen">
       {/* Header */}
-      <PageHeader
-        icon={Mail}
-        title="Alert Management"
-        description="Track and manage email alerts sent to customers across your SaaS monitoring platform"
-        iconGradient="from-blue-500 to-purple-600"
-      />
+      <div className="space-y-2">
+        <div className="flex items-center space-x-3">
+          <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl shadow-lg">
+            <Mail className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-semibold tracking-tight">Alert Management</h1>
+            <p className="text-muted-foreground">
+              Track and manage email alerts sent to customers across your SaaS monitoring platform
+            </p>
+          </div>
+        </div>
+      </div>
 
       {/* Summary Statistics */}
       <div className="grid gap-6 md:grid-cols-5">
-        <StatCard
-          title="Total Alerts Emailed"
-          value={summaryStats.totalEmailed.toLocaleString()}
-          icon={MailCheck}
-          gradient="from-blue-100 to-blue-100"
-        />
-        <StatCard
-          title="Failed Emails"
-          value={summaryStats.failedEmails}
-          icon={XCircle}
-          gradient="from-red-100 to-red-100"
-        />
-        <StatCard
-          title="Critical Alerts Sent"
-          value={summaryStats.criticalSent.toLocaleString()}
-          icon={AlertCircle}
-          gradient="from-orange-100 to-orange-100"
-        />
-        <StatCard
-          title="Most Emailed Alert"
-          value={summaryStats.mostCommonAlertType}
-          icon={TrendingUp}
-          gradient="from-purple-100 to-purple-100"
-        />
-        <StatCard
-          title="Most Affected Category"
-          value={summaryStats.mostAffectedCategory}
-          icon={BarChart3}
-          gradient="from-green-100 to-green-100"
-        />
+        <Card className="relative overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300 group">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-100 to-blue-100 opacity-5 group-hover:opacity-10 transition-opacity duration-300" />
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-muted-foreground">Total Alerts Emailed</p>
+                <span className="text-2xl font-bold">{summaryStats.totalEmailed.toLocaleString()}</span>
+              </div>
+              <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-blue-100 to-blue-100 rounded-xl shadow-md group-hover:scale-110 transition-transform duration-300">
+                <MailCheck className="h-6 w-6 text-blue-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="relative overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300 group">
+          <div className="absolute inset-0 bg-gradient-to-br from-red-100 to-red-100 opacity-5 group-hover:opacity-10 transition-opacity duration-300" />
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-muted-foreground">Failed Emails</p>
+                <span className="text-2xl font-bold">{summaryStats.failedEmails}</span>
+              </div>
+              <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-red-100 to-red-100 rounded-xl shadow-md group-hover:scale-110 transition-transform duration-300">
+                <XCircle className="h-6 w-6 text-red-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="relative overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300 group">
+          <div className="absolute inset-0 bg-gradient-to-br from-orange-100 to-orange-100 opacity-5 group-hover:opacity-10 transition-opacity duration-300" />
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-muted-foreground">Critical Alerts Sent</p>
+                <span className="text-2xl font-bold">{summaryStats.criticalSent.toLocaleString()}</span>
+              </div>
+              <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-orange-100 to-orange-100 rounded-xl shadow-md group-hover:scale-110 transition-transform duration-300">
+                <AlertCircle className="h-6 w-6 text-orange-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="relative overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300 group">
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-100 to-purple-100 opacity-5 group-hover:opacity-10 transition-opacity duration-300" />
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-muted-foreground">Most Emailed Alert</p>
+                <span className="text-2xl font-bold">{summaryStats.mostCommonAlertType}</span>
+              </div>
+              <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-purple-100 to-purple-100 rounded-xl shadow-md group-hover:scale-110 transition-transform duration-300">
+                <TrendingUp className="h-6 w-6 text-purple-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="relative overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300 group">
+          <div className="absolute inset-0 bg-gradient-to-br from-green-100 to-green-100 opacity-5 group-hover:opacity-10 transition-opacity duration-300" />
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-muted-foreground">Most Affected Category</p>
+                <span className="text-2xl font-bold">{summaryStats.mostAffectedCategory}</span>
+              </div>
+              <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-green-100 to-green-100 rounded-xl shadow-md group-hover:scale-110 transition-transform duration-300">
+                <BarChart3 className="h-6 w-6 text-green-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Filter Controls */}
-      <SearchAndFilter
-        searchValue={searchTerm}
-        onSearchChange={setSearchTerm}
-        searchPlaceholder="Search by Customer, Product, Resource, or Alert ID"
-        filters={[
-          {
-            value: dateRangeFilter,
-            onChange: setDateRangeFilter,
-            placeholder: "Date Range",
-            options: [
-              { value: '1day', label: 'Last 24 Hours' },
-              { value: '7days', label: 'Last 7 Days' },
-              { value: '30days', label: 'Last 30 Days' },
-              { value: '90days', label: 'Last 90 Days' }
-            ]
-          },
-          {
-            value: productFilter,
-            onChange: setProductFilter,
-            placeholder: "Product",
-            options: [
-              { value: 'all', label: 'All Products' },
-              { value: 'Acronis', label: 'Acronis' },
-              { value: 'Microsoft', label: 'Microsoft' },
-              { value: 'Bitdefender', label: 'Bitdefender' },
-              { value: 'Zoho', label: 'Zoho' }
-            ]
-          },
-          {
-            value: severityFilter,
-            onChange: setSeverityFilter,
-            placeholder: "Severity",
-            options: [
-              { value: 'all', label: 'All Severities' },
-              { value: 'Critical', label: 'Critical' },
-              { value: 'Error', label: 'Error' },
-              { value: 'Warning', label: 'Warning' },
-              { value: 'Info', label: 'Info' }
-            ]
-          },
-          {
-            value: categoryFilter,
-            onChange: setCategoryFilter,
-            placeholder: "Category",
-            options: [
-              { value: 'all', label: 'All Categories' },
-              { value: 'Backup', label: 'Backup' },
-              { value: 'Email Security', label: 'Email Security' },
-              { value: 'System', label: 'System' },
-              { value: 'EDR', label: 'EDR' },
-              { value: 'Licensing', label: 'Licensing' }
-            ]
-          },
-          {
-            value: emailStatusFilter,
-            onChange: setEmailStatusFilter,
-            placeholder: "Email Status",
-            options: [
-              { value: 'all', label: 'All Statuses' },
-              { value: 'Sent', label: 'Sent' },
-              { value: 'Failed', label: 'Failed' },
-              { value: 'Pending', label: 'Pending' }
-            ]
-          }
-        ]}
-        onReset={handleResetFilters}
-      />
+      <Card className="border-0 shadow-lg">
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Filter className="w-5 h-5" />
+            <span>Filter Controls</span>
+          </CardTitle>
+          <CardDescription>
+            Filter and search through data
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0 lg:space-x-4">
+            <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3 flex-1">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search by Customer, Product, Resource, or Alert ID"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 bg-white shadow-sm"
+                />
+              </div>
+              
+              <Select value={dateRangeFilter} onValueChange={setDateRangeFilter}>
+                <SelectTrigger className="w-full sm:w-48 bg-white shadow-sm">
+                  <SelectValue placeholder="Date Range" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1day">Last 24 Hours</SelectItem>
+                  <SelectItem value="7days">Last 7 Days</SelectItem>
+                  <SelectItem value="30days">Last 30 Days</SelectItem>
+                  <SelectItem value="90days">Last 90 Days</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select value={productFilter} onValueChange={setProductFilter}>
+                <SelectTrigger className="w-full sm:w-48 bg-white shadow-sm">
+                  <SelectValue placeholder="Product" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Products</SelectItem>
+                  <SelectItem value="Acronis">Acronis</SelectItem>
+                  <SelectItem value="Microsoft">Microsoft</SelectItem>
+                  <SelectItem value="Bitdefender">Bitdefender</SelectItem>
+                  <SelectItem value="Zoho">Zoho</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select value={severityFilter} onValueChange={setSeverityFilter}>
+                <SelectTrigger className="w-full sm:w-48 bg-white shadow-sm">
+                  <SelectValue placeholder="Severity" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Severities</SelectItem>
+                  <SelectItem value="Critical">Critical</SelectItem>
+                  <SelectItem value="Error">Error</SelectItem>
+                  <SelectItem value="Warning">Warning</SelectItem>
+                  <SelectItem value="Info">Info</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select value={emailStatusFilter} onValueChange={setEmailStatusFilter}>
+                <SelectTrigger className="w-full sm:w-48 bg-white shadow-sm">
+                  <SelectValue placeholder="Email Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Statuses</SelectItem>
+                  <SelectItem value="Sent">Sent</SelectItem>
+                  <SelectItem value="Failed">Failed</SelectItem>
+                  <SelectItem value="Pending">Pending</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <Button variant="outline" onClick={handleResetFilters}>
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Reset
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Main Content Area */}
       <Card className="border-0 shadow-lg">
@@ -514,4 +734,22 @@ export function AlertManagementPage() {
       </Dialog>
     </div>
   );
+}
+
+function formatDateTime(dateString: string) {
+  return new Date(dateString).toLocaleString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+
+function formatDate(dateString: string) {
+  return new Date(dateString).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  });
 }

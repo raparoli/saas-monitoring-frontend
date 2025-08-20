@@ -1,7 +1,4 @@
 import React, { useState } from 'react';
-import { INTEGRATION_REQUIREMENTS } from '../src/constants/products';
-import { IntegrationProduct } from '../src/types';
-import { getProductIcon } from '../src/utils/icons';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/dialog';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -19,8 +16,26 @@ import {
   Loader2,
   Key,
   Shield,
-  Info
+  Info,
+  HardDrive,
+  Cloud
 } from 'lucide-react';
+
+interface IntegrationProduct {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  provider?: string;
+  rating?: number;
+  users?: string;
+  pricing?: string;
+  features?: string[];
+  isPopular?: boolean;
+  isRecommended?: boolean;
+  integrationComplexity?: 'Simple' | 'Moderate' | 'Advanced';
+  status?: 'Available' | 'Coming Soon' | 'Beta' | 'Integrated';
+}
 
 interface IntegrationWindowProps {
   product: IntegrationProduct;
@@ -29,6 +44,24 @@ interface IntegrationWindowProps {
 }
 
 type IntegrationStep = 'overview' | 'credentials' | 'configuration' | 'permissions' | 'testing' | 'success';
+
+const INTEGRATION_REQUIREMENTS = {
+  microsoft: {
+    credentials: ['Application ID', 'Client Secret', 'Tenant ID'],
+    permissions: ['User.Read.All', 'Organization.Read.All', 'Directory.Read.All'],
+    requirements: ['Admin consent required', 'Azure AD application registration']
+  },
+  bitdefender: {
+    credentials: ['API Key', 'Company ID'],
+    permissions: ['Read company information', 'Manage licenses', 'View usage reports'],
+    requirements: ['GravityZone account', 'API access enabled']
+  },
+  acronis: {
+    credentials: ['API Key', 'Server URL', 'Username'],
+    permissions: ['Read backup status', 'Manage users', 'View reports'],
+    requirements: ['Acronis Cyber Cloud account', 'Partner portal access']
+  }
+};
 
 export function IntegrationWindow({ product, onClose, onComplete }: IntegrationWindowProps) {
   const [currentStep, setCurrentStep] = useState<IntegrationStep>('overview');
@@ -61,6 +94,13 @@ export function IntegrationWindow({ product, onClose, onComplete }: IntegrationW
 
   const getCurrentStepIndex = () => steps.findIndex(step => step.id === currentStep);
   const progress = ((getCurrentStepIndex() + 1) / steps.length) * 100;
+
+  const getProductIcon = (productName: string) => {
+    if (productName.includes('Acronis')) return HardDrive;
+    if (productName.includes('Microsoft')) return Cloud;
+    if (productName.includes('Bitdefender')) return Shield;
+    return Shield;
+  };
 
   const handleNext = async () => {
     const stepIndex = getCurrentStepIndex();

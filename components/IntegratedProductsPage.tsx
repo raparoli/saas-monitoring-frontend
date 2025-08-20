@@ -1,15 +1,8 @@
 import React, { useState } from 'react';
-import { AVAILABLE_PRODUCTS } from '../src/constants/products';
-import { ProductDetail, IntegrationProduct, Page } from '../src/types';
-import { getProductIcon, getCategoryIcon } from '../src/utils/icons';
-import { getStatusBadgeVariant, getUsageBadgeVariant, getComplexityBadgeColor } from '../src/utils/badge-variants';
-import { getProductGradient } from '../src/utils/product-gradients';
-import { formatDate, getDaysUntilRenewal, getUsagePercentage } from '../src/utils/formatters';
-import { PageHeader } from '../src/components/common/PageHeader';
-import { SearchAndFilter } from '../src/components/common/SearchAndFilter';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
+import { Input } from './ui/input';
 import { Progress } from './ui/progress';
 import { Separator } from './ui/separator';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
@@ -22,14 +15,95 @@ import {
   Clock,
   Zap,
   Award,
-  ArrowRight
+  ArrowRight,
+  Search,
+  Filter,
+  BarChart3,
+  Users,
+  Shield,
+  FileText,
+  HardDrive,
+  AlertTriangle
 } from 'lucide-react';
+
+interface ProductDetail {
+  id: string;
+  name: string;
+  logo: string;
+  status: string;
+  totalLicenses: number;
+  usedLicenses: number;
+  licenseType: string;
+  renewalDate: string;
+}
+
+interface IntegrationProduct {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  provider?: string;
+  rating?: number;
+  users?: string;
+  pricing?: string;
+  features?: string[];
+  isPopular?: boolean;
+  isRecommended?: boolean;
+  integrationComplexity?: 'Simple' | 'Moderate' | 'Advanced';
+  status?: 'Available' | 'Coming Soon' | 'Beta' | 'Integrated';
+}
 
 interface IntegratedProductsPageProps {
   onViewDetails: (page: 'product-detail', product: ProductDetail) => void;
   onAcronisDetail: () => void;
   onStartIntegration: (product: IntegrationProduct) => void;
 }
+
+const AVAILABLE_PRODUCTS: IntegrationProduct[] = [
+  {
+    id: 'bitdefender',
+    name: 'Bitdefender GravityZone',
+    description: 'Advanced endpoint protection with machine learning-based threat detection and response capabilities.',
+    category: 'Security',
+    provider: 'Bitdefender',
+    rating: 4.8,
+    users: '10K+',
+    pricing: 'From $29.99/month',
+    features: ['Endpoint Protection', 'Threat Intelligence', 'Advanced Analytics', 'Compliance Reporting'],
+    isPopular: true,
+    isRecommended: true,
+    integrationComplexity: 'Simple',
+    status: 'Available'
+  },
+  {
+    id: 'microsoft',
+    name: 'Microsoft 365',
+    description: 'Complete productivity suite with Office applications, cloud storage, and collaboration tools for enterprise.',
+    category: 'Productivity',
+    provider: 'Microsoft',
+    rating: 4.6,
+    users: '50K+',
+    pricing: 'From $12.50/month',
+    features: ['Office Suite', 'OneDrive Storage', 'Teams Collaboration', 'Exchange Email'],
+    isPopular: true,
+    integrationComplexity: 'Simple',
+    status: 'Available'
+  },
+  {
+    id: 'zoho',
+    name: 'Zoho Workplace',
+    description: 'Integrated business suite offering email, document management, and collaboration tools for organizations.',
+    category: 'Productivity',
+    provider: 'Zoho Corporation',
+    rating: 4.4,
+    users: '25K+',
+    pricing: 'From $3/month per user',
+    features: ['Email & Calendar', 'Document Management', 'Team Chat', 'Video Conferencing'],
+    isRecommended: true,
+    integrationComplexity: 'Moderate',
+    status: 'Available'
+  }
+];
 
 export function IntegratedProductsPage({ onViewDetails, onAcronisDetail, onStartIntegration }: IntegratedProductsPageProps) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -47,21 +121,105 @@ export function IntegratedProductsPage({ onViewDetails, onAcronisDetail, onStart
     }
   ];
 
+  const getProductIcon = (productName: string) => {
+    if (productName.includes('Acronis')) return HardDrive;
+    if (productName.includes('Microsoft')) return Cloud;
+    if (productName.includes('Bitdefender')) return Shield;
+    return Shield;
+  };
 
-    const getStatusBadge = (status: string) => {
-      switch (status) {
-        case 'Available':
-          return <Badge className="bg-green-100 text-green-800 hover:bg-green-200">Available</Badge>;
-        case 'Integrated':
-          return <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-200">✓ Integrated</Badge>;
-        case 'Coming Soon':
-          return <Badge className="bg-orange-100 text-orange-800 hover:bg-orange-200">Coming Soon</Badge>;
-        case 'Beta':
-          return <Badge className="bg-purple-100 text-purple-800 hover:bg-purple-200">Beta</Badge>;
-        default:
-          return <Badge variant="secondary">{status}</Badge>;
-      }
-    };
+  const getCategoryIcon = (category: string) => {
+    switch (category) {
+      case 'Security': return Shield;
+      case 'Productivity': return FileText;
+      case 'Backup': return HardDrive;
+      default: return Cloud;
+    }
+  };
+
+  const getProductGradient = (productId: string): string => {
+    switch (productId) {
+      case 'acronis':
+        return 'bg-gradient-to-br from-orange-50 to-red-100 border-orange-200';
+      case 'microsoft':
+        return 'bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200';
+      case 'bitdefender':
+        return 'bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200';
+      case 'zoho':
+        return 'bg-gradient-to-br from-green-50 to-green-100 border-green-200';
+      default:
+        return 'bg-gradient-to-br from-gray-50 to-gray-100 border-gray-200';
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
+  const getDaysUntilRenewal = (renewalDate: string) => {
+    const renewal = new Date(renewalDate);
+    const today = new Date();
+    const diffTime = renewal.getTime() - today.getTime();
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  };
+
+  const getUsagePercentage = (used: number, total: number) => {
+    return Math.round((used / total) * 100);
+  };
+
+  const getStatusBadgeVariant = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'active':
+      case 'enabled':
+      case 'connected':
+      case 'sent':
+        return 'default';
+      case 'warning':
+      case 'pending':
+        return 'secondary';
+      case 'inactive':
+      case 'disabled':
+      case 'failed':
+      case 'suspended':
+        return 'destructive';
+      default:
+        return 'secondary';
+    }
+  };
+
+  const getUsageBadgeVariant = (percentage: number) => {
+    if (percentage >= 90) return 'destructive';
+    if (percentage >= 75) return 'secondary';
+    return 'default';
+  };
+
+  const getComplexityColor = (complexity: string) => {
+    switch (complexity) {
+      case 'Simple': return 'bg-green-100 text-green-800';
+      case 'Moderate': return 'bg-yellow-100 text-yellow-800';
+      case 'Advanced': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'Available':
+        return <Badge className="bg-green-100 text-green-800 hover:bg-green-200">Available</Badge>;
+      case 'Integrated':
+        return <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-200">✓ Integrated</Badge>;
+      case 'Coming Soon':
+        return <Badge className="bg-orange-100 text-orange-800 hover:bg-orange-200">Coming Soon</Badge>;
+      case 'Beta':
+        return <Badge className="bg-purple-100 text-purple-800 hover:bg-purple-200">Beta</Badge>;
+      default:
+        return <Badge variant="secondary">{status}</Badge>;
+    }
+  };
 
   const handleViewDetails = (product: ProductDetail) => {
     if (product.id === 'acronis') {
@@ -77,118 +235,53 @@ export function IntegratedProductsPage({ onViewDetails, onAcronisDetail, onStart
 
   const availableProducts = AVAILABLE_PRODUCTS.filter(p => p.status === 'Available');
 
-  const getComplexityColor = (complexity: string) => {
-    switch (complexity) {
-      case 'Simple': return 'bg-green-100 text-green-800';
-      case 'Moderate': return 'bg-yellow-100 text-yellow-800';
-      case 'Advanced': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
   return (
     <TooltipProvider>
       <div className="flex-1 p-6 space-y-8">
-        {/* Enhanced Header Section */}
-        <PageHeader
-          icon={Cloud}
-          title="Products"
-          description="Manage and monitor your connected SaaS products with comprehensive insights"
-          iconGradient="from-blue-500 to-purple-600"
-        >
-          <SearchAndFilter
-            searchValue={searchTerm}
-            onSearchChange={setSearchTerm}
-            searchPlaceholder="Search products..."
-          />
-        </PageHeader>
+        {/* Header */}
+        <div className="space-y-2">
+          <div className="flex items-center space-x-3">
+            <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl shadow-lg">
+              <Cloud className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-semibold tracking-tight">Products</h1>
+              <p className="text-muted-foreground">
+                Manage and monitor your connected SaaS products with comprehensive insights
+              </p>
+            </div>
+          </div>
+        </div>
 
-        {/* Enhanced Summary Cards with better visual hierarchy */}
-        {/* <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          <Card className="relative overflow-hidden bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 hover:shadow-lg transition-all duration-300">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="space-y-2">
-                  <p className="text-sm font-medium text-blue-700">Total Products</p>
-                  <p className="text-3xl font-bold text-blue-900">{totalProducts}</p>
-                  <div className="flex items-center space-x-1 text-xs text-blue-600">
-                    <CheckCircle className="w-3 h-3" />
-                    <span>{activeProducts} active</span>
-                  </div>
-                </div>
-                <div className="flex items-center justify-center w-12 h-12 bg-blue-500 rounded-xl shadow-lg">
-                  <Cloud className="w-6 h-6 text-white" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card className="relative overflow-hidden bg-gradient-to-br from-green-50 to-green-100 border-green-200 hover:shadow-lg transition-all duration-300">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="space-y-2">
-                  <p className="text-sm font-medium text-green-700">Total Licenses</p>
-                  <p className="text-3xl font-bold text-green-900">{totalLicenses.toLocaleString()}</p>
-                  <div className="flex items-center space-x-1 text-xs text-green-600">
-                    <TrendingUp className="w-3 h-3" />
-                    <span>Across all products</span>
-                  </div>
-                </div>
-                <div className="flex items-center justify-center w-12 h-12 bg-green-500 rounded-xl shadow-lg">
-                  <Shield className="w-6 h-6 text-white" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card className="relative overflow-hidden bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 hover:shadow-lg transition-all duration-300">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="space-y-2">
-                  <p className="text-sm font-medium text-purple-700">License Utilization</p>
-                  <div className="flex items-baseline space-x-2">
-                    <p className="text-3xl font-bold text-purple-900">{overallUsagePercentage}%</p>
-                    <span className="text-sm text-purple-600">of {totalLicenses}</span>
-                  </div>
-                  <div className="w-full bg-purple-200 rounded-full h-2">
-                    <div 
-                      className="bg-purple-500 h-2 rounded-full transition-all duration-500"
-                      style={{ width: `${overallUsagePercentage}%` }}
-                    />
-                  </div>
-                </div>
-                <div className="flex items-center justify-center w-12 h-12 bg-purple-500 rounded-xl shadow-lg">
-                  <Activity className="w-6 h-6 text-white" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card className="relative overflow-hidden bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200 hover:shadow-lg transition-all duration-300">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="space-y-2">
-                  <p className="text-sm font-medium text-orange-700">Next Renewal</p>
-                  <p className="text-3xl font-bold text-orange-900">{nextRenewalDays}d</p>
-                  <div className="flex items-center space-x-1 text-xs text-orange-600">
-                    <Clock className="w-3 h-3" />
-                    <span>Days remaining</span>
-                  </div>
-                </div>
-                <div className="flex items-center justify-center w-12 h-12 bg-orange-500 rounded-xl shadow-lg">
-                  <Calendar className="w-6 h-6 text-white" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div> */}
+        {/* Search */}
+        <Card className="border-0 shadow-lg">
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Filter className="w-5 h-5" />
+              <span>Filter Controls</span>
+            </CardTitle>
+            <CardDescription>
+              Filter and search through data
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search products..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 bg-white shadow-sm"
+              />
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Enhanced Product Cards Grid */}
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              {/* <h2 className="text-xl font-semibold">Product Overview</h2> */}
-                <h2 className="text-xl font-semibold">Integrated Products</h2>
+              <h2 className="text-xl font-semibold">Integrated Products</h2>
               <p className="text-sm text-muted-foreground">
                 Detailed view of all integrated products and their performance metrics
               </p>
@@ -323,89 +416,85 @@ export function IntegratedProductsPage({ onViewDetails, onAcronisDetail, onStart
           </div>
         </div>
 
-
-                  {/* Available Products */}
-          <div className="space-y-4">
-            <div className="flex items-center space-x-2">
-              <Star className="w-5 h-5 text-yellow-500" />
-              <h2 className="text-xl font-semibold">Available Products</h2>
-              <Badge className="bg-yellow-100 text-yellow-800">Ready to Integrate</Badge>
-            </div>
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {availableProducts.map((product) => {
-                const Icon = getCategoryIcon(product.category);
-                return (
-                  <Card key={product.id} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 group relative overflow-hidden">
-                    {product.isPopular && (
-                      <div className="absolute top-4 right-4 z-10">
-                        <Badge className="bg-yellow-100 text-yellow-800 shadow-sm">
-                          <Star className="w-3 h-3 mr-1" />
-                          Popular
-                        </Badge>
-                      </div>
-                    )}
-                    {product.isRecommended && !product.isPopular && (
-                      <div className="absolute top-4 right-4 z-10">
-                        <Badge className="bg-purple-100 text-purple-800 shadow-sm">
-                          <Award className="w-3 h-3 mr-1" />
-                          Recommended
-                        </Badge>
-                      </div>
-                    )}
-                    
-                    <CardContent className="p-6">
-                      <div className="flex items-start space-x-4 mb-4">
-                        <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-gray-500 to-gray-600 rounded-xl shadow-md group-hover:scale-110 transition-transform duration-300">
-                          <Icon className="w-6 h-6 text-white" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-lg mb-1">{product.name}</h3>
-                          <p className="text-sm text-muted-foreground mb-2">{product.provider}</p>
-                          <Badge variant="outline" className="text-xs">
-                            {product.category}
-                          </Badge>
-                        </div>
-                      </div>
-                      
-                      <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{product.description}</p>
-                      
-                      <div className="space-y-3 mb-4">
-                        {product.rating && (
-                          <div className="flex items-center space-x-2">
-                            <div className="flex items-center space-x-1">
-                              <Star className="w-4 h-4 text-yellow-500 fill-current" />
-                              <span className="text-sm font-medium">{product.rating}</span>
-                            </div>
-                            <Separator orientation="vertical" className="h-4" />
-                            <span className="text-sm text-muted-foreground">{product.users} users</span>
-                          </div>
-                        )}
-                        
-                        <div className="flex items-center justify-between">
-                          <Badge variant="outline" className={getComplexityColor(product.integrationComplexity || 'Simple')}>
-                            {product.integrationComplexity || 'Simple'} Setup
-                          </Badge>
-                          {getStatusBadge(product.status || 'Available')}
-                        </div>
-                        
-
-                      </div>
-                      
-                      <Button 
-                        className="w-full shadow-sm hover:shadow-md group-hover:bg-primary/90" 
-                        onClick={() => onStartIntegration(product)}
-                        disabled={product.status !== 'Available'}
-                      >
-                        Start Integration
-                        <ArrowRight className="w-4 h-4 ml-2" />
-                      </Button>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
+        {/* Available Products */}
+        <div className="space-y-4">
+          <div className="flex items-center space-x-2">
+            <Star className="w-5 h-5 text-yellow-500" />
+            <h2 className="text-xl font-semibold">Available Products</h2>
+            <Badge className="bg-yellow-100 text-yellow-800">Ready to Integrate</Badge>
           </div>
-       
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {availableProducts.map((product) => {
+              const IconComponent = getCategoryIcon(product.category);
+              return (
+                <Card key={product.id} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 group relative overflow-hidden">
+                  {product.isPopular && (
+                    <div className="absolute top-4 right-4 z-10">
+                      <Badge className="bg-yellow-100 text-yellow-800 shadow-sm">
+                        <Star className="w-3 h-3 mr-1" />
+                        Popular
+                      </Badge>
+                    </div>
+                  )}
+                  {product.isRecommended && !product.isPopular && (
+                    <div className="absolute top-4 right-4 z-10">
+                      <Badge className="bg-purple-100 text-purple-800 shadow-sm">
+                        <Award className="w-3 h-3 mr-1" />
+                        Recommended
+                      </Badge>
+                    </div>
+                  )}
+                  
+                  <CardContent className="p-6">
+                    <div className="flex items-start space-x-4 mb-4">
+                      <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-gray-500 to-gray-600 rounded-xl shadow-md group-hover:scale-110 transition-transform duration-300">
+                        <IconComponent className="w-6 h-6 text-white" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-lg mb-1">{product.name}</h3>
+                        <p className="text-sm text-muted-foreground mb-2">{product.provider}</p>
+                        <Badge variant="outline" className="text-xs">
+                          {product.category}
+                        </Badge>
+                      </div>
+                    </div>
+                    
+                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{product.description}</p>
+                    
+                    <div className="space-y-3 mb-4">
+                      {product.rating && (
+                        <div className="flex items-center space-x-2">
+                          <div className="flex items-center space-x-1">
+                            <Star className="w-4 h-4 text-yellow-500 fill-current" />
+                            <span className="text-sm font-medium">{product.rating}</span>
+                          </div>
+                          <Separator orientation="vertical" className="h-4" />
+                          <span className="text-sm text-muted-foreground">{product.users} users</span>
+                        </div>
+                      )}
+                      
+                      <div className="flex items-center justify-between">
+                        <Badge variant="outline" className={getComplexityColor(product.integrationComplexity || 'Simple')}>
+                          {product.integrationComplexity || 'Simple'} Setup
+                        </Badge>
+                        {getStatusBadge(product.status || 'Available')}
+                      </div>
+                    </div>
+                    
+                    <Button 
+                      className="w-full shadow-sm hover:shadow-md group-hover:bg-primary/90" 
+                      onClick={() => onStartIntegration(product)}
+                      disabled={product.status !== 'Available'}
+                    >
+                      Start Integration
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </Button>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
 
         {/* Enhanced Quick Actions Section */}
         <Card className="bg-gradient-to-r from-slate-50 to-blue-50 border-slate-200">
@@ -434,7 +523,15 @@ export function IntegratedProductsPage({ onViewDetails, onAcronisDetail, onStart
             </div>
           </CardContent>
         </Card>
-    </div> 
+      </div> 
     </TooltipProvider>  
   );
+}
+
+function formatDate(dateString: string) {
+  return new Date(dateString).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  });
 }

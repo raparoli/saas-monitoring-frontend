@@ -1,14 +1,9 @@
 import React, { useState } from 'react';
-import { AVAILABLE_PRODUCTS, PRODUCT_CATEGORIES } from '../src/constants/products';
-import { IntegrationProduct } from '../src/types';
-import { getCategoryIcon } from '../src/utils/icons';
-import { getComplexityBadgeColor } from '../src/utils/badge-variants';
-import { PageHeader } from '../src/components/common/PageHeader';
-import { StatCard } from '../src/components/common/StatCard';
-import { SearchAndFilter } from '../src/components/common/SearchAndFilter';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
+import { Input } from './ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Separator } from './ui/separator';
 import { 
   Plus, 
@@ -17,24 +12,117 @@ import {
   CheckCircle,
   Award,
   ArrowRight,
-  Filter
+  Filter,
+  Search,
+  Shield,
+  FileText,
+  Cloud
 } from 'lucide-react';
+
+interface IntegrationProduct {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  provider?: string;
+  rating?: number;
+  users?: string;
+  pricing?: string;
+  features?: string[];
+  isPopular?: boolean;
+  isRecommended?: boolean;
+  integrationComplexity?: 'Simple' | 'Moderate' | 'Advanced';
+  status?: 'Available' | 'Coming Soon' | 'Beta' | 'Integrated';
+}
 
 interface ProductsPageProps {
   onStartIntegration: (product: IntegrationProduct) => void;
 }
 
+const AVAILABLE_PRODUCTS: IntegrationProduct[] = [
+  {
+    id: 'acronis',
+    name: 'Acronis Cyber Protect',
+    description: 'Comprehensive backup and cybersecurity solution combining data protection with anti-malware capabilities.',
+    category: 'Security',
+    provider: 'Acronis',
+    rating: 4.7,
+    users: '15K+',
+    pricing: 'From $69/month',
+    features: ['Backup & Recovery', 'Anti-malware Protection', 'Vulnerability Assessment', 'Patch Management'],
+    isPopular: true,
+    isRecommended: true,
+    integrationComplexity: 'Simple',
+    status: 'Integrated'
+  },
+  {
+    id: 'bitdefender',
+    name: 'Bitdefender GravityZone',
+    description: 'Advanced endpoint protection with machine learning-based threat detection and response capabilities.',
+    category: 'Security',
+    provider: 'Bitdefender',
+    rating: 4.8,
+    users: '10K+',
+    pricing: 'From $29.99/month',
+    features: ['Endpoint Protection', 'Threat Intelligence', 'Advanced Analytics', 'Compliance Reporting'],
+    isPopular: true,
+    isRecommended: true,
+    integrationComplexity: 'Simple',
+    status: 'Available'
+  },
+  {
+    id: 'microsoft',
+    name: 'Microsoft 365',
+    description: 'Complete productivity suite with Office applications, cloud storage, and collaboration tools for enterprise.',
+    category: 'Productivity',
+    provider: 'Microsoft',
+    rating: 4.6,
+    users: '50K+',
+    pricing: 'From $12.50/month',
+    features: ['Office Suite', 'OneDrive Storage', 'Teams Collaboration', 'Exchange Email'],
+    isPopular: true,
+    integrationComplexity: 'Simple',
+    status: 'Available'
+  },
+  {
+    id: 'zoho',
+    name: 'Zoho Workplace',
+    description: 'Integrated business suite offering email, document management, and collaboration tools for organizations.',
+    category: 'Productivity',
+    provider: 'Zoho Corporation',
+    rating: 4.4,
+    users: '25K+',
+    pricing: 'From $3/month per user',
+    features: ['Email & Calendar', 'Document Management', 'Team Chat', 'Video Conferencing'],
+    isRecommended: true,
+    integrationComplexity: 'Moderate',
+    status: 'Available'
+  }
+];
+
+const PRODUCT_CATEGORIES = ['all', 'Security', 'Productivity'] as const;
+
 export function ProductsPage({ onStartIntegration }: ProductsPageProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
 
-  const filteredProducts = AVAILABLE_PRODUCTS.filter(product => {
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.category.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
+  const getCategoryIcon = (category: string) => {
+    switch (category) {
+      case 'Security': return Shield;
+      case 'Productivity': return FileText;
+      case 'Backup': return Database;
+      default: return Cloud;
+    }
+  };
+
+  const getComplexityBadgeColor = (complexity: string) => {
+    switch (complexity) {
+      case 'Simple': return 'bg-green-100 text-green-800';
+      case 'Moderate': return 'bg-yellow-100 text-yellow-800';
+      case 'Advanced': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -51,66 +139,138 @@ export function ProductsPage({ onStartIntegration }: ProductsPageProps) {
     }
   };
 
+  const filteredProducts = AVAILABLE_PRODUCTS.filter(product => {
+    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         product.category.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
+
   const availableProducts = AVAILABLE_PRODUCTS.filter(p => p.status === 'Available');
   const integratedProducts = AVAILABLE_PRODUCTS.filter(p => p.status === 'Integrated');
-  const popularProducts = AVAILABLE_PRODUCTS.filter(p => p.isPopular && p.status === 'Available');
   const recommendedProducts = AVAILABLE_PRODUCTS.filter(p => p.isRecommended && p.status === 'Available');
 
   return (
     <div className="flex-1 p-6 space-y-8 bg-gradient-to-br from-slate-50 via-white to-purple-50 min-h-screen">
-      {/* Enhanced Header */}
-      <PageHeader
-        icon={Plus}
-        title="Product Marketplace"
-        description="Discover and integrate powerful SaaS products to enhance your organization's capabilities"
-        iconGradient="from-purple-500 to-pink-600"
-      />
+      {/* Header */}
+      <div className="space-y-2">
+        <div className="flex items-center space-x-3">
+          <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl shadow-lg">
+            <Plus className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-semibold tracking-tight">Product Marketplace</h1>
+            <p className="text-muted-foreground">
+              Discover and integrate powerful SaaS products to enhance your organization's capabilities
+            </p>
+          </div>
+        </div>
+      </div>
 
       {/* Stats Overview */}
       <div className="grid gap-4 md:grid-cols-4">
-        <StatCard
-          title="Available Products"
-          value={availableProducts.length}
-          icon={Database}
-          gradient="from-blue-50 to-blue-100"
-        />
-        <StatCard
-          title="Integrated"
-          value={integratedProducts.length}
-          icon={CheckCircle}
-          gradient="from-green-50 to-green-100"
-        />
-        <StatCard
-          title="Categories"
-          value={PRODUCT_CATEGORIES.length - 1}
-          icon={Filter}
-          gradient="from-purple-50 to-purple-100"
-        />
-        <StatCard
-          title="Recommended"
-          value={recommendedProducts.length}
-          icon={Award}
-          gradient="from-orange-50 to-orange-100"
-        />
+        <Card className="relative overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300 group">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-blue-100 opacity-5 group-hover:opacity-10 transition-opacity duration-300" />
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-muted-foreground">Available Products</p>
+                <span className="text-2xl font-bold">{availableProducts.length}</span>
+              </div>
+              <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl shadow-md group-hover:scale-110 transition-transform duration-300">
+                <Database className="h-6 w-6 text-blue-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="relative overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300 group">
+          <div className="absolute inset-0 bg-gradient-to-br from-green-50 to-green-100 opacity-5 group-hover:opacity-10 transition-opacity duration-300" />
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-muted-foreground">Integrated</p>
+                <span className="text-2xl font-bold">{integratedProducts.length}</span>
+              </div>
+              <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-green-50 to-green-100 rounded-xl shadow-md group-hover:scale-110 transition-transform duration-300">
+                <CheckCircle className="h-6 w-6 text-green-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="relative overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300 group">
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-50 to-purple-100 opacity-5 group-hover:opacity-10 transition-opacity duration-300" />
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-muted-foreground">Categories</p>
+                <span className="text-2xl font-bold">{PRODUCT_CATEGORIES.length - 1}</span>
+              </div>
+              <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl shadow-md group-hover:scale-110 transition-transform duration-300">
+                <Filter className="h-6 w-6 text-purple-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="relative overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300 group">
+          <div className="absolute inset-0 bg-gradient-to-br from-orange-50 to-orange-100 opacity-5 group-hover:opacity-10 transition-opacity duration-300" />
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-muted-foreground">Recommended</p>
+                <span className="text-2xl font-bold">{recommendedProducts.length}</span>
+              </div>
+              <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl shadow-md group-hover:scale-110 transition-transform duration-300">
+                <Award className="h-6 w-6 text-orange-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Search and Filter Controls */}
-      <SearchAndFilter
-        searchValue={searchTerm}
-        onSearchChange={setSearchTerm}
-        searchPlaceholder="Search products, descriptions, or categories..."
-        filters={[
-          {
-            value: selectedCategory,
-            onChange: setSelectedCategory,
-            placeholder: "All Categories",
-            options: PRODUCT_CATEGORIES.map(cat => ({
-              value: cat,
-              label: cat === 'all' ? 'All Categories' : cat
-            }))
-          }
-        ]}
-      />
+      <Card className="border-0 shadow-lg">
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Filter className="w-5 h-5" />
+            <span>Filter Controls</span>
+          </CardTitle>
+          <CardDescription>
+            Filter and search through data
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0 lg:space-x-4">
+            <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3 flex-1">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search products, descriptions, or categories..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 bg-white shadow-sm"
+                />
+              </div>
+              
+              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                <SelectTrigger className="w-full sm:w-48 bg-white shadow-sm">
+                  <SelectValue placeholder="All Categories" />
+                </SelectTrigger>
+                <SelectContent>
+                  {PRODUCT_CATEGORIES.map(cat => (
+                    <SelectItem key={cat} value={cat}>
+                      {cat === 'all' ? 'All Categories' : cat}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Featured Sections */}
       {searchTerm === '' && selectedCategory === 'all' && (

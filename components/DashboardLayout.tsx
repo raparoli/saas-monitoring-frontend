@@ -1,6 +1,4 @@
 import React from 'react';
-import { NAVIGATION_ITEMS, QUICK_ACTIONS } from '../src/constants/navigation';
-import { Page } from '../src/types';
 import { Button } from './ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Badge } from './ui/badge';
@@ -11,7 +9,25 @@ import {
   Search,
   ChevronDown,
   Sparkles,
+  LayoutDashboard,
+  Package,
+  Plug,
+  Mail,
+  Users,
+  Activity,
+  Shield,
+  Zap
 } from 'lucide-react';
+
+type Page = 'login' | 'dashboard' | 'products' | 'integrated-products' | 'product-detail' | 'acronis-detail' | 'alert-management' | 'user-management';
+
+interface NavigationItem {
+  id: Page;
+  label: string;
+  icon: typeof LayoutDashboard;
+  badge?: string | null;
+  gradient: string;
+}
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -19,6 +35,65 @@ interface DashboardLayoutProps {
   onNavigate: (page: Page) => void;
   onLogout: () => void;
 }
+
+const NAVIGATION_ITEMS: NavigationItem[] = [
+  {
+    id: 'dashboard',
+    label: 'Dashboard',
+    icon: LayoutDashboard,
+    badge: null,
+    gradient: 'from-blue-500 to-blue-600'
+  },
+  {
+    id: 'products',
+    label: 'Product Marketplace',
+    icon: Package,
+    badge: 'New',
+    gradient: 'from-purple-500 to-purple-600'
+  },
+  {
+    id: 'integrated-products',
+    label: 'Integrated Products',
+    icon: Plug,
+    badge: '1',
+    gradient: 'from-green-500 to-green-600'
+  },
+  {
+    id: 'alert-management',
+    label: 'Alert Management',
+    icon: Mail,
+    badge: '10.8K',
+    gradient: 'from-orange-500 to-orange-600'
+  },
+  {
+    id: 'user-management',
+    label: 'User Management',
+    icon: Users,
+    badge: '5',
+    gradient: 'from-indigo-500 to-indigo-600'
+  }
+];
+
+const QUICK_ACTIONS = [
+  {
+    label: 'System Health',
+    icon: Activity,
+    status: 'Healthy',
+    color: 'text-green-500'
+  },
+  {
+    label: 'Security Score',
+    icon: Shield,
+    status: '95%',
+    color: 'text-blue-500'
+  },
+  {
+    label: 'Performance',
+    icon: Zap,
+    status: 'Optimal',
+    color: 'text-yellow-500'
+  }
+];
 
 export function DashboardLayout({ children, currentPage, onNavigate, onLogout }: DashboardLayoutProps) {
   return (
@@ -92,7 +167,7 @@ export function DashboardLayout({ children, currentPage, onNavigate, onLogout }:
           {/* Quick Status */}
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
-              {React.createElement(QUICK_ACTIONS[0].icon, { className: "w-4 h-4 text-gray-500" })}
+              <Activity className="w-4 h-4 text-gray-500" />
               <span className="text-sm font-medium text-gray-700">System Status</span>
             </div>
             
