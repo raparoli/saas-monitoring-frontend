@@ -92,17 +92,17 @@ export function DashboardLayout({ children, currentPage, onNavigate, onLogout }:
           {/* Quick Status */}
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
-              <QUICK_ACTIONS[0].icon className="w-4 h-4 text-gray-500" />
+              {React.createElement(QUICK_ACTIONS[0].icon, { className: "w-4 h-4 text-gray-500" })}
               <span className="text-sm font-medium text-gray-700">System Status</span>
             </div>
             
             <div className="space-y-3">
               {QUICK_ACTIONS.map((action, index) => {
-                const Icon = action.icon;
+                const IconComponent = action.icon;
                 return (
                   <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200">
                     <div className="flex items-center space-x-3">
-                      <Icon className={`w-4 h-4 ${action.color}`} />
+                      <IconComponent className={`w-4 h-4 ${action.color}`} />
                       <span className="text-sm text-gray-700">{action.label}</span>
                     </div>
                     <Badge variant="outline" className="text-xs">
