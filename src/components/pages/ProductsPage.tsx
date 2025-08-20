@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useApi } from '../../hooks/useApi';
+import { apiService } from '../../services/api';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
@@ -19,7 +21,7 @@ import {
   Cloud
 } from 'lucide-react';
 import { IntegrationProduct } from '../../types';
-import { AVAILABLE_PRODUCTS, PRODUCT_CATEGORIES } from '../../constants';
+import { PRODUCT_CATEGORIES } from '../../constants';
 import { getCategoryIcon } from '../../lib/icons';
 
 interface ProductsPageProps {
@@ -29,6 +31,17 @@ interface ProductsPageProps {
 export function ProductsPage({ onStartIntegration }: ProductsPageProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+
+  // API integration
+  const { data: products = [], loading, error, refetch } = useApi(
+    () => apiService.getAvailableProducts({
+      search: searchTerm,
+      category: selectedCategory
+    }),
+    {
+      immediate: true
+    }
+  );
 
   const getComplexityBadgeColor = (complexity: string) => {
     switch (complexity) {
@@ -54,7 +67,7 @@ export function ProductsPage({ onStartIntegration }: ProductsPageProps) {
     }
   };
 
-  const filteredProducts = AVAILABLE_PRODUCTS.filter(product => {
+  const filteredProducts = products.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          product.category.toLowerCase().includes(searchTerm.toLowerCase());
@@ -62,9 +75,9 @@ export function ProductsPage({ onStartIntegration }: ProductsPageProps) {
     return matchesSearch && matchesCategory;
   });
 
-  const availableProducts = AVAILABLE_PRODUCTS.filter(p => p.status === 'Available');
-  const integratedProducts = AVAILABLE_PRODUCTS.filter(p => p.status === 'Integrated');
-  const recommendedProducts = AVAILABLE_PRODUCTS.filter(p => p.isRecommended && p.status === 'Available');
+  const availableProducts = products.filter(p => p.status === 'Available');
+  const integratedProducts = products.filter(p => p.status === 'Integrated');
+  const recommendedProducts = products.filter(p => p.isRecommended && p.status === 'Available');
 
   return (
     <div className="flex-1 p-6 space-y-8 bg-gradient-to-br from-slate-50 via-white to-purple-50 min-h-screen">
@@ -183,12 +196,40 @@ export function ProductsPage({ onStartIntegration }: ProductsPageProps) {
                 </SelectContent>
               </Select>
             </div>
+            
+            <div className="flex items-center space-x-2">
+              <Button variant="outline" onClick={refetch} disabled={loading}>
+                <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+                Refresh
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
 
+      {/* Loading and Error States */}
+      {loading && (
+        <Card className="border-0 shadow-lg">
+          <CardContent className="p-6 text-center">
+            <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2" />
+            <p>Loading products...</p>
+          </CardContent>
+        </Card>
+      )}
+
+      {error && (
+        <Card className="border-0 shadow-lg border-red-200 bg-red-50">
+          <CardContent className="p-6 text-center">
+            <p className="text-red-600">Error loading products: {error}</p>
+            <Button variant="outline" onClick={refetch} className="mt-2">
+              Try Again
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Featured Sections */}
-      {searchTerm === '' && selectedCategory === 'all' && (
+      {!loading && !error && searchTerm === '' && selectedCategory === 'all' && (
         <div className="space-y-8">
           {/* Integrated Products */}
           <div className="space-y-4">
@@ -344,7 +385,7 @@ export function ProductsPage({ onStartIntegration }: ProductsPageProps) {
       )}
 
       {/* All Products Grid */}
-      {(searchTerm !== '' || selectedCategory !== 'all') && (
+      {!loading && !error && (searchTerm !== '' || selectedCategory !== 'all') && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-semibold">Search Results</h2>

@@ -1,4 +1,6 @@
 import React, { useState, useMemo } from 'react';
+import { useApi } from '../../hooks/useApi';
+import { apiService } from '../../services/api';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
@@ -26,7 +28,6 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { AlertEmailLog } from '../../types';
-import { MOCK_ALERT_EMAIL_LOGS } from '../../constants';
 import { 
   formatDateTime,
   getSeverityBadgeVariant,
@@ -47,11 +48,29 @@ export function AlertManagementPage() {
   const [selectedAlert, setSelectedAlert] = useState<AlertEmailLog | null>(null);
   const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
 
+  // API integration
+  const { data: alertsData, loading, error, refetch } = useApi(
+    () => apiService.getAlertEmailLogs({
+      search: searchTerm,
+      severity: severityFilter,
+      category: categoryFilter,
+      emailStatus: emailStatusFilter,
+      product: productFilter,
+      dateRange: dateRangeFilter,
+      page: currentPage,
+      limit: itemsPerPage
+    }),
+    {
+      immediate: true
+    }
+  );
+
+  const alerts = alertsData || [];
   const itemsPerPage = 10;
 
   // Filtered data
   const filteredAlerts = useMemo(() => {
-    return MOCK_ALERT_EMAIL_LOGS.filter(alert => {
+    return alerts.filter(alert => {
       const matchesSearch = 
         alert.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         alert.resourceName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -65,7 +84,7 @@ export function AlertManagementPage() {
 
       return matchesSearch && matchesSeverity && matchesCategory && matchesEmailStatus && matchesProduct;
     });
-  }, [searchTerm, severityFilter, categoryFilter, emailStatusFilter, productFilter]);
+  }, [alerts, searchTerm, severityFilter, categoryFilter, emailStatusFilter, productFilter]);
 
   // Pagination
   const totalPages = Math.ceil(filteredAlerts.length / itemsPerPage);
@@ -76,12 +95,12 @@ export function AlertManagementPage() {
 
   // Summary statistics
   const summaryStats = useMemo(() => {
-    const totalEmailed = MOCK_ALERT_EMAIL_LOGS.length;
-    const failedEmails = MOCK_ALERT_EMAIL_LOGS.filter(a => a.emailStatus === 'Failed').length;
-    const criticalSent = MOCK_ALERT_EMAIL_LOGS.filter(a => a.severity === 'Critical' && a.emailStatus === 'Sent').length;
+    const totalEmailed = alerts.length;
+    const failedEmails = alerts.filter(a => a.emailStatus === 'Failed').length;
+    const criticalSent = alerts.filter(a => a.severity === 'Critical' && a.emailStatus === 'Sent').length;
     
     // Most common alert type
-    const alertTypeCounts = MOCK_ALERT_EMAIL_LOGS.reduce((acc, alert) => {
+    const alertTypeCounts = alerts.reduce((acc, alert) => {
       acc[alert.alertType] = (acc[alert.alertType] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
@@ -89,7 +108,7 @@ export function AlertManagementPage() {
       .sort(([,a], [,b]) => b - a)[0]?.[0] || 'N/A';
 
     // Most affected category
-    const categoryCounts = MOCK_ALERT_EMAIL_LOGS.reduce((acc, alert) => {
+    const categoryCounts = alerts.reduce((acc, alert) => {
       acc[alert.category] = (acc[alert.category] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
@@ -103,7 +122,7 @@ export function AlertManagementPage() {
       mostCommonAlertType,
       mostAffectedCategory
     };
-  }, []);
+  }, [alerts]);
 
   const handleViewDetails = (alert: AlertEmailLog) => {
     setSelectedAlert(alert);
@@ -122,6 +141,7 @@ export function AlertManagementPage() {
     setProductFilter('all');
     setDateRangeFilter('7days');
     setCurrentPage(1);
+    refetch();
   };
 
   return (
@@ -299,13 +319,39 @@ export function AlertManagementPage() {
                 <RefreshCw className="w-4 h-4 mr-2" />
                 Reset
               </Button>
+              <Button variant="outline" onClick={refetch} disabled={loading}>
+                <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+                Refresh
+              </Button>
             </div>
           </div>
         </CardContent>
       </Card>
 
+      {/* Loading and Error States */}
+      {loading && (
+        <Card className="border-0 shadow-lg">
+          <CardContent className="p-6 text-center">
+            <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2" />
+            <p>Loading alerts...</p>
+          </CardContent>
+        </Card>
+      )}
+
+      {error && (
+        <Card className="border-0 shadow-lg border-red-200 bg-red-50">
+          <CardContent className="p-6 text-center">
+            <p className="text-red-600">Error loading alerts: {error}</p>
+            <Button variant="outline" onClick={refetch} className="mt-2">
+              Try Again
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Main Content Area */}
-      <Card className="border-0 shadow-lg">
+      {!loading && !error && (
+        <Card className="border-0 shadow-lg">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
@@ -428,6 +474,7 @@ export function AlertManagementPage() {
           </div>
         </CardContent>
       </Card>
+      )}
 
       {/* Alert Details Modal */}
       <Dialog open={isAlertModalOpen} onOpenChange={setIsAlertModalOpen}>

@@ -1,4 +1,6 @@
 import React from 'react';
+import { useApi } from '../../hooks/useApi';
+import { apiService } from '../../services/api';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
@@ -44,11 +46,19 @@ interface DashboardProps {
 }
 
 export function Dashboard({ onAcronisDetail }: DashboardProps) {
+  // API integration
+  const { data: dashboardData, loading, error, refetch } = useApi(
+    () => apiService.getDashboardStats(),
+    {
+      immediate: true
+    }
+  );
+
   // Global Summary Data
-  const globalStats = [
+  const globalStats = dashboardData ? [
     {
       title: 'Total SaaS Products Integrated',
-      value: '1',
+      value: dashboardData.totalProducts.toString(),
       change: '+1 this month',
       trend: 'up',
       icon: Target,
@@ -56,7 +66,7 @@ export function Dashboard({ onAcronisDetail }: DashboardProps) {
     },
     {
       title: 'Total Customers Across All Products',
-      value: '140+',
+      value: `${dashboardData.totalCustomers}+`,
       change: '+12 this week',
       trend: 'up',
       icon: Users,
@@ -64,7 +74,7 @@ export function Dashboard({ onAcronisDetail }: DashboardProps) {
     },
     {
       title: 'Protected Workloads (Combined)',
-      value: '460',
+      value: dashboardData.protectedWorkloads.toString(),
       change: '+23 this month',
       trend: 'up',
       icon: Shield,
@@ -72,45 +82,19 @@ export function Dashboard({ onAcronisDetail }: DashboardProps) {
     },
     {
       title: 'Overall License Utilization Rate',
-      value: '89.6%',
+      value: `${dashboardData.licenseUtilization}%`,
       change: '+2.4% this month',
       trend: 'up',
       icon: Activity,
       color: 'from-orange-500 to-orange-600'
     }
-  ];
+  ] : [];
 
   // Storage Distribution Data
-  const storageData = [
-    { name: 'Local Storage', value: 45, color: '#3b82f6' },
-    { name: 'Cloud Storage', value: 35, color: '#10b981' },
-    { name: 'Hybrid Storage', value: 20, color: '#f59e0b' }
-  ];
+  const storageData = dashboardData?.storageDistribution || [];
 
   // License Utilization by Product Data
-  const licenseUtilizationData = [
-    {
-      product: 'Acronis',
-      used: 187,
-      available: 13,
-      overused: 0,
-      total: 200
-    },
-    {
-      product: 'Microsoft',
-      used: 0,
-      available: 250,
-      overused: 0,
-      total: 250
-    },
-    {
-      product: 'Bitdefender',
-      used: 0,
-      available: 150,
-      overused: 0,
-      total: 150
-    }
-  ];
+  const licenseUtilizationData = dashboardData?.licenseUtilizationData || [];
 
   // Integrated Products Data
   const integratedProducts = [
@@ -126,12 +110,12 @@ export function Dashboard({ onAcronisDetail }: DashboardProps) {
   ];
 
   // Alert Summary Data
-  const alertStats = [
-    { title: 'Critical Alerts', value: '5731', color: 'from-red-500 to-red-600', icon: AlertCircle },
-    { title: 'Warning Alerts', value: '13177', color: 'from-yellow-500 to-yellow-600', icon: AlertTriangle },
-    { title: 'Errors', value: '649', color: 'from-orange-500 to-orange-600', icon: AlertTriangle },
-    { title: 'Informational', value: '747', color: 'from-blue-500 to-blue-600', icon: Info }
-  ];
+  const alertStats = dashboardData?.alertStats.map(stat => ({
+    ...stat,
+    icon: stat.title.includes('Critical') ? AlertCircle :
+          stat.title.includes('Warning') ? AlertTriangle :
+          stat.title.includes('Error') ? AlertTriangle : Info
+  })) || [];
 
   // Alerts by Product Data
   const alertsByProductData = [
@@ -187,8 +171,32 @@ export function Dashboard({ onAcronisDetail }: DashboardProps) {
 
   return (
     <div className="flex-1 p-6 space-y-8 bg-gradient-to-br from-slate-50 via-white to-purple-50 min-h-screen">
+      {/* Loading State */}
+      {loading && (
+        <Card className="border-0 shadow-lg">
+          <CardContent className="p-6 text-center">
+            <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2" />
+            <p>Loading dashboard data...</p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Error State */}
+      {error && (
+        <Card className="border-0 shadow-lg border-red-200 bg-red-50">
+          <CardContent className="p-6 text-center">
+            <p className="text-red-600">Error loading dashboard: {error}</p>
+            <Button variant="outline" onClick={refetch} className="mt-2">
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Try Again
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Enhanced Header */}
-      <div className="space-y-2">
+      {!loading && !error && (
+        <div className="space-y-2">
         <div className="flex items-center space-x-3">
           <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl shadow-lg">
             <Activity className="w-6 h-6 text-white" />
@@ -515,10 +523,15 @@ export function Dashboard({ onAcronisDetail }: DashboardProps) {
                 <Activity className="w-4 h-4 mr-2" />
                 View Analytics
               </Button>
+              <Button variant="outline" onClick={refetch} disabled={loading}>
+                <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+                Refresh Data
+              </Button>
             </div>
           </div>
         </CardContent>
       </Card>
+      )}
     </div>
   );
 }

@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useMutation } from '../../hooks/useApi';
+import { apiService } from '../../services/api';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
@@ -14,6 +16,10 @@ export function LoginPage({ onLogin }: LoginPageProps) {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+
+  const loginMutation = useMutation((credentials: { email: string; password: string }) =>
+    apiService.login(credentials.email, credentials.password)
+  );
 
   const validateForm = () => {
     const newErrors: { email?: string; password?: string } = {};
@@ -34,10 +40,16 @@ export function LoginPage({ onLogin }: LoginPageProps) {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
-      onLogin();
+      try {
+        await loginMutation.mutate({ email, password });
+        onLogin();
+      } catch (error) {
+        // Error is already handled by the mutation
+        console.error('Login failed:', error);
+      }
     }
   };
 
@@ -106,9 +118,15 @@ export function LoginPage({ onLogin }: LoginPageProps) {
                 )}
               </div>
 
-              <Button type="submit" className="w-full">
-                Sign In
+              <Button type="submit" className="w-full" disabled={loginMutation.loading}>
+                {loginMutation.loading ? 'Signing In...' : 'Sign In'}
               </Button>
+              
+              {loginMutation.error && (
+                <div className="text-sm text-destructive text-center">
+                  {loginMutation.error}
+                </div>
+              )}
             </form>
 
             <div className="mt-6 text-center space-y-2">

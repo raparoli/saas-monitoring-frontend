@@ -1,4 +1,6 @@
 import React, { useState, useMemo } from 'react';
+import { useApi } from '../../hooks/useApi';
+import { apiService } from '../../services/api';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
@@ -16,19 +18,29 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { User } from '../../types';
-import { MOCK_USERS } from '../../constants';
 import { getRoleBadgeColor, getInitials } from '../../utils';
 
 export function UserManagementPage() {
   // State management
-  const [users, setUsers] = useState<User[]>(MOCK_USERS);
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('All');
   const [statusFilter, setStatusFilter] = useState('All');
 
+  // API integration
+  const { data: users = [], loading, error, refetch } = useApi(
+    () => apiService.getUsers({
+      search: searchTerm,
+      role: roleFilter,
+      status: statusFilter
+    }),
+    {
+      immediate: true
+    }
+  );
+
   // Filtered users
   const filteredUsers = useMemo(() => {
-    return users.filter(user => {
+    return (users || []).filter(user => {
       const matchesSearch = 
         user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.email.toLowerCase().includes(searchTerm.toLowerCase());
@@ -44,6 +56,7 @@ export function UserManagementPage() {
     setSearchTerm('');
     setRoleFilter('All');
     setStatusFilter('All');
+    refetch();
   };
 
   return (
@@ -118,13 +131,39 @@ export function UserManagementPage() {
                 <RefreshCw className="w-4 h-4 mr-2" />
                 Reset
               </Button>
+              <Button variant="outline" onClick={refetch} disabled={loading}>
+                <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+                Refresh
+              </Button>
             </div>
           </div>
         </CardContent>
       </Card>
 
+      {/* Loading and Error States */}
+      {loading && (
+        <Card className="border-0 shadow-lg">
+          <CardContent className="p-6 text-center">
+            <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2" />
+            <p>Loading users...</p>
+          </CardContent>
+        </Card>
+      )}
+
+      {error && (
+        <Card className="border-0 shadow-lg border-red-200 bg-red-50">
+          <CardContent className="p-6 text-center">
+            <p className="text-red-600">Error loading users: {error}</p>
+            <Button variant="outline" onClick={refetch} className="mt-2">
+              Try Again
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Users Table */}
-      <Card className="border bg-white">
+      {!loading && !error && (
+        <Card className="border bg-white">
         <CardHeader>
           <CardTitle className="text-base font-medium">
             Users ({filteredUsers.length})
@@ -191,6 +230,7 @@ export function UserManagementPage() {
           </Table>
         </CardContent>
       </Card>
+      )}
     </div>
   );
 }

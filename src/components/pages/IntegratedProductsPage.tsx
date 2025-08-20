@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useApi } from '../../hooks/useApi';
+import { apiService } from '../../services/api';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
@@ -27,7 +29,6 @@ import {
 } from 'lucide-react';
 import { ProductDetail, IntegrationProduct } from '../../types';
 import { AVAILABLE_PRODUCTS } from '../../constants';
-import { 
   getProductIcon, 
   getCategoryIcon 
 } from '../../lib/icons';
@@ -50,7 +51,19 @@ interface IntegratedProductsPageProps {
 export function IntegratedProductsPage({ onViewDetails, onAcronisDetail, onStartIntegration }: IntegratedProductsPageProps) {
   const [searchTerm, setSearchTerm] = useState('');
   
-  const integratedProducts: ProductDetail[] = [
+  // API integration for integrated products
+  const { data: integratedProducts = [], loading: integratedLoading, error: integratedError, refetch: refetchIntegrated } = useApi(
+    () => apiService.getIntegratedProducts(),
+    { immediate: true }
+  );
+
+  // API integration for available products
+  const { data: availableProductsData = [], loading: availableLoading, error: availableError, refetch: refetchAvailable } = useApi(
+    () => apiService.getAvailableProducts({ search: searchTerm }),
+    { immediate: true }
+  );
+
+  const mockIntegratedProducts: ProductDetail[] = [
     {
       id: 'acronis',
       name: 'Acronis Cyber Protect',
@@ -63,6 +76,8 @@ export function IntegratedProductsPage({ onViewDetails, onAcronisDetail, onStart
     }
   ];
 
+  const actualIntegratedProducts = integratedProducts.length > 0 ? integratedProducts : mockIntegratedProducts;
+
   const handleViewDetails = (product: ProductDetail) => {
     if (product.id === 'acronis') {
       onAcronisDetail();
@@ -71,11 +86,11 @@ export function IntegratedProductsPage({ onViewDetails, onAcronisDetail, onStart
     }
   };
 
-  const filteredProducts = integratedProducts.filter(product =>
+  const filteredProducts = actualIntegratedProducts.filter(product =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const availableProducts = AVAILABLE_PRODUCTS.filter(p => p.status === 'Available');
+  const availableProducts = availableProductsData.filter(p => p.status === 'Available');
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -109,6 +124,8 @@ export function IntegratedProductsPage({ onViewDetails, onAcronisDetail, onStart
             </div>
           </div>
         </div>
+        )}
+        )}
 
         {/* Search */}
         <Card className="border-0 shadow-lg">
@@ -133,9 +150,38 @@ export function IntegratedProductsPage({ onViewDetails, onAcronisDetail, onStart
             </div>
           </CardContent>
         </Card>
+        
+        {/* Loading and Error States */}
+        {(integratedLoading || availableLoading) && (
+          <Card className="border-0 shadow-lg">
+            <CardContent className="p-6 text-center">
+              <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2" />
+              <p>Loading products...</p>
+            </CardContent>
+          </Card>
+        )}
+
+        {(integratedError || availableError) && (
+          <Card className="border-0 shadow-lg border-red-200 bg-red-50">
+            <CardContent className="p-6 text-center">
+              <p className="text-red-600">
+                Error loading products: {integratedError || availableError}
+              </p>
+              <div className="flex justify-center space-x-2 mt-2">
+                <Button variant="outline" onClick={refetchIntegrated}>
+                  Retry Integrated
+                </Button>
+                <Button variant="outline" onClick={refetchAvailable}>
+                  Retry Available
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Enhanced Product Cards Grid */}
-        <div className="space-y-6">
+        {!integratedLoading && !integratedError && (
+          <div className="space-y-6">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-xl font-semibold">Integrated Products</h2>
@@ -274,7 +320,8 @@ export function IntegratedProductsPage({ onViewDetails, onAcronisDetail, onStart
         </div>
 
         {/* Available Products */}
-        <div className="space-y-4">
+        {!availableLoading && !availableError && (
+          <div className="space-y-4">
           <div className="flex items-center space-x-2">
             <Star className="w-5 h-5 text-yellow-500" />
             <h2 className="text-xl font-semibold">Available Products</h2>
