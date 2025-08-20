@@ -113,6 +113,7 @@ export function Dashboard({ onAcronisDetail }: DashboardProps) {
     icon: stat.title.includes('Critical') ? AlertCircle :
           stat.title.includes('Warning') ? AlertTriangle :
           stat.title.includes('Error') ? AlertTriangle : Info
+  }));
 
   // Alerts by Product Data
   const alertsByProductData = [
