@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useAuth } from './hooks/useAuth';
 import { LoginPage } from './components/pages/LoginPage';
 import { DashboardLayout } from './components/layout/DashboardLayout';
 import { Dashboard } from './components/pages/Dashboard';
@@ -12,15 +13,15 @@ import { UserManagementPage } from './components/pages/UserManagementPage';
 import { Page, ProductDetail, IntegrationProduct } from './types';
 
 export default function App() {
+  const { isAuthenticated, user, isLoading, login, logout } = useAuth();
   const [currentPage, setCurrentPage] = useState<Page>('login');
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<ProductDetail | null>(null);
   const [integrationProduct, setIntegrationProduct] = useState<IntegrationProduct | null>(null);
   const [showIntegrationWindow, setShowIntegrationWindow] = useState(false);
   const [acronisSourcePage, setAcronisSourcePage] = useState<Page>('dashboard');
 
-  const handleLogin = () => {
-    setIsLoggedIn(true);
+  const handleLogin = async (email: string, password: string) => {
+    await login(email, password);
     setCurrentPage('dashboard');
   };
 
@@ -31,9 +32,9 @@ export default function App() {
     setCurrentPage(page);
   };
 
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-    setCurrentPage('login');
+  const handleLogout = async () => {
+    await logout();
+    setCurrentPage('dashboard');
     setSelectedProduct(null);
     setIntegrationProduct(null);
     setShowIntegrationWindow(false);
@@ -70,7 +71,19 @@ export default function App() {
     setCurrentPage(acronisSourcePage);
   };
 
-  if (!isLoggedIn) {
+  // Show loading spinner while checking authentication
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
     return <LoginPage onLogin={handleLogin} />;
   }
 
@@ -112,6 +125,7 @@ export default function App() {
         currentPage={currentPage}
         onNavigate={handleNavigation}
         onLogout={handleLogout}
+        user={user}
       >
         {renderPage()}
       </DashboardLayout>

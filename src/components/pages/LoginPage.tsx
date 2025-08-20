@@ -8,14 +8,16 @@ import { Label } from '../ui/label';
 import { Eye, EyeOff, Monitor } from 'lucide-react';
 
 interface LoginPageProps {
-  onLogin: () => void;
+  onLogin: (email: string, password: string) => Promise<void>;
 }
 
 export function LoginPage({ onLogin }: LoginPageProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const [loginError, setLoginError] = useState<string>('');
 
   const loginMutation = useMutation((credentials: { email: string; password: string }) =>
     apiService.login(credentials.email, credentials.password)
@@ -42,9 +44,17 @@ export function LoginPage({ onLogin }: LoginPageProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoginError('');
+    
     if (validateForm()) {
+      setIsLoading(true);
       try {
-        await loginMutation.mutate({ email, password });
+        await onLogin(email, password);
+      } catch (error) {
+        setLoginError(error instanceof Error ? error.message : 'Login failed');
+      } finally {
+        setIsLoading(false);
+      }
         onLogin();
       } catch (error) {
         // Error is already handled by the mutation
@@ -125,6 +135,12 @@ export function LoginPage({ onLogin }: LoginPageProps) {
               {loginMutation.error && (
                 <div className="text-sm text-destructive text-center">
                   {loginMutation.error}
+                {isLoading ? 'Signing In...' : 'Sign In'}
+              )}
+              
+              {loginError && (
+                <div className="text-sm text-destructive text-center">
+                  {loginError}
                 </div>
               )}
             </form>

@@ -12,15 +12,30 @@ import {
 } from 'lucide-react';
 import { Page } from '../../types';
 import { NAVIGATION_ITEMS, QUICK_ACTIONS } from '../../constants';
+import { AuthUser } from '../../services/auth';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
   currentPage: Page;
   onNavigate: (page: Page) => void;
-  onLogout: () => void;
+  onLogout: () => Promise<void>;
+  user: AuthUser | null;
 }
 
-export function DashboardLayout({ children, currentPage, onNavigate, onLogout }: DashboardLayoutProps) {
+export function DashboardLayout({ children, currentPage, onNavigate, onLogout, user }: DashboardLayoutProps) {
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await onLogout();
+    } catch (error) {
+      console.error('Logout failed:', error);
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
+
   return (
     <div className="flex h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
       {/* Enhanced Sidebar */}
@@ -122,15 +137,21 @@ export function DashboardLayout({ children, currentPage, onNavigate, onLogout }:
             <Avatar className="w-10 h-10">
               <AvatarImage src="/api/placeholder/40/40" />
               <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white font-medium">
-                JD
+                {user?.name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'U'}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
-              <p className="font-medium text-gray-900 truncate">John Doe</p>
-              <p className="text-xs text-gray-500 truncate">System Administrator</p>
+              <p className="font-medium text-gray-900 truncate">{user?.name || 'User'}</p>
+              <p className="text-xs text-gray-500 truncate">{user?.role || 'User'}</p>
             </div>
-            <Button variant="ghost" size="sm" onClick={onLogout} className="flex-shrink-0">
-              <LogOut className="w-4 h-4" />
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={handleLogout} 
+              disabled={isLoggingOut}
+              className="flex-shrink-0"
+            >
+              <LogOut className={`w-4 h-4 ${isLoggingOut ? 'animate-spin' : ''}`} />
             </Button>
           </div>
         </div>
@@ -176,7 +197,7 @@ export function DashboardLayout({ children, currentPage, onNavigate, onLogout }:
                 <Avatar className="w-8 h-8">
                   <AvatarImage src="/api/placeholder/32/32" />
                   <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-xs">
-                    JD
+                    {user?.name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'U'}
                   </AvatarFallback>
                 </Avatar>
                 <ChevronDown className="w-4 h-4" />

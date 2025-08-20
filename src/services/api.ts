@@ -5,6 +5,7 @@ import {
   IntegrationProduct, 
   ProductDetail 
 } from '../types';
+import { authService } from './auth';
 import { 
   mockUsers, 
   mockAlertEmailLogs, 
@@ -27,26 +28,26 @@ interface ApiResponse<T> {
 class ApiService {
   private baseUrl = '/api/v1';
 
+  // Get headers with authentication
+  private getHeaders(): Record<string, string> {
+    return {
+      'Content-Type': 'application/json',
+      ...authService.getAuthHeader()
+    };
+  }
+
   // Authentication
-  async login(email: string, password: string): Promise<ApiResponse<{ token: string; user: User }>> {
-    await delay(1000);
+  async login(email: string, password: string): Promise<ApiResponse<{ tokens: any; user: User }>> {
+    const { tokens, user } = await authService.login(email, password);
     
-    // Mock authentication logic
-    if (email && password.length >= 6) {
-      return {
-        success: true,
-        data: {
-          token: 'mock-jwt-token-' + Date.now(),
-          user: mockUsers[0]
-        }
-      };
-    }
-    
-    throw new Error('Invalid credentials');
+    return {
+      success: true,
+      data: { tokens, user }
+    };
   }
 
   async logout(): Promise<ApiResponse<null>> {
-    await delay(500);
+    await authService.logout();
     return {
       success: true,
       data: null,
