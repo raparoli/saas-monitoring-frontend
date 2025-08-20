@@ -55,11 +55,6 @@ export function LoginPage({ onLogin }: LoginPageProps) {
       } finally {
         setIsLoading(false);
       }
-        onLogin();
-      } catch (error) {
-        // Error is already handled by the mutation
-        console.error('Login failed:', error);
-      }
     }
   };
 
@@ -135,7 +130,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
               {loginMutation.error && (
                 <div className="text-sm text-destructive text-center">
                   {loginMutation.error}
-                {isLoading ? 'Signing In...' : 'Sign In'}
+                </div>
               )}
               
               {loginError && (
