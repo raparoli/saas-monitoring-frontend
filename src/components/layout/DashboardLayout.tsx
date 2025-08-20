@@ -13,7 +13,6 @@ import {
 import { Page } from '../../types';
 import { NAVIGATION_ITEMS, QUICK_ACTIONS } from '../../constants';
 import { AuthUser } from '../../services/auth';
-import { getInitials } from '../../utils';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -21,6 +20,10 @@ interface DashboardLayoutProps {
   onNavigate: (page: Page) => void;
   onLogout: () => Promise<void>;
   user: AuthUser | null;
+}
+
+function getInitials(name: string): string {
+  return name.split(' ').map(n => n[0]).join('').toUpperCase();
 }
 
 export function DashboardLayout({ children, currentPage, onNavigate, onLogout, user }: DashboardLayoutProps) {
@@ -138,7 +141,7 @@ export function DashboardLayout({ children, currentPage, onNavigate, onLogout, u
             <Avatar className="w-10 h-10">
               <AvatarImage src="/api/placeholder/40/40" />
               <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white font-medium">
-                {user?.name ? user.name.split(' ').map(n => n?.[0] || '').join('').toUpperCase() || 'U' : 'U'}
+                {user && user.name && typeof user.name === 'string' ? getInitials(user.name) : 'U'}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
@@ -198,7 +201,7 @@ export function DashboardLayout({ children, currentPage, onNavigate, onLogout, u
                 <Avatar className="w-8 h-8">
                   <AvatarImage src="/api/placeholder/32/32" />
                   <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-xs">
-                    {user?.name ? user.name.split(' ').map(n => n?.[0] || '').join('').toUpperCase() || 'U' : 'U'}
+                    {user && user.name && typeof user.name === 'string' ? getInitials(user.name) : 'U'}
                   </AvatarFallback>
                 </Avatar>
                 <ChevronDown className="w-4 h-4" />
