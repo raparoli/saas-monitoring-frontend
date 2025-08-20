@@ -138,7 +138,7 @@ export function ProductsPage({ onStartIntegration }: ProductsPageProps) {
                     <CardContent className="p-6 relative">
                       <div className="flex items-start space-x-4 mb-4">
                         <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl shadow-md group-hover:scale-110 transition-transform duration-300">
-                          <getCategoryIcon(product.category) className="w-6 h-6 text-white" />
+                          {React.createElement(getCategoryIcon(product.category), { className: "w-6 h-6 text-white" })}
                         </div>
                         <div className="flex-1 min-w-0">
                           <h3 className="font-semibold text-lg mb-1">{product.name}</h3>
@@ -218,7 +218,7 @@ export function ProductsPage({ onStartIntegration }: ProductsPageProps) {
                     <CardContent className="p-6">
                       <div className="flex items-start space-x-4 mb-4">
                         <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-gray-500 to-gray-600 rounded-xl shadow-md group-hover:scale-110 transition-transform duration-300">
-                          <getCategoryIcon(product.category) className="w-6 h-6 text-white" />
+                          {React.createElement(getCategoryIcon(product.category), { className: "w-6 h-6 text-white" })}
                         </div>
                         <div className="flex-1 min-w-0">
                           <h3 className="font-semibold text-lg mb-1">{product.name}</h3>
