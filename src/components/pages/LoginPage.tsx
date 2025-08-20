@@ -22,13 +22,13 @@ export function LoginPage({ onLogin }: LoginPageProps) {
   const validateForm = () => {
     const newErrors: { email?: string; password?: string } = {};
     
-    if (!email || typeof email !== 'string' || email.trim() === '') {
+    if (!email || typeof email !== 'string' || email === null || email.trim() === '') {
       newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(email.trim())) {
       newErrors.email = 'Please enter a valid email address';
     }
     
-    if (!password || typeof password !== 'string') {
+    if (!password || typeof password !== 'string' || password === null) {
       newErrors.password = 'Password is required';
     } else if (password.trim().length < 6) {
       newErrors.password = 'Password must be at least 6 characters';
@@ -45,7 +45,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
     if (validateForm()) {
       setIsLoading(true);
       try {
-        await onLogin(email.trim(), password);
+        await onLogin((email || '').trim(), password || '');
       } catch (error) {
         setLoginError(error instanceof Error && error.message ? error.message : 'Login failed');
       } finally {
