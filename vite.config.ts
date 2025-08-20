@@ -11,14 +11,14 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
-      '@/components': path.resolve(__dirname, './src/components'),
-      '@/lib': path.resolve(__dirname, './src/lib'),
-      '@/utils': path.resolve(__dirname, './src/utils'),
-      '@/types': path.resolve(__dirname, './src/types'),
-      '@/constants': path.resolve(__dirname, './src/constants'),
-      '@/hooks': path.resolve(__dirname, './src/hooks'),
-      '@/services': path.resolve(__dirname, './src/services'),
-      '@/data': path.resolve(__dirname, './src/data')
+      '@/shared': path.resolve(__dirname, './src/shared'),
+      '@/modules': path.resolve(__dirname, './src/modules'),
+      '@/auth': path.resolve(__dirname, './src/modules/auth'),
+      '@/dashboard': path.resolve(__dirname, './src/modules/dashboard'),
+      '@/products': path.resolve(__dirname, './src/modules/products'),
+      '@/alerts': path.resolve(__dirname, './src/modules/alerts'),
+      '@/users': path.resolve(__dirname, './src/modules/users'),
+      '@/acronis': path.resolve(__dirname, './src/modules/acronis')
     }
   },
   esbuild: {

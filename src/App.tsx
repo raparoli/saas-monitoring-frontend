@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
-import { useAuth } from './hooks/useAuth';
-import { LoginPage } from './components/pages/LoginPage';
-import { DashboardLayout } from './components/layout/DashboardLayout';
-import { Dashboard } from './components/pages/Dashboard';
-import { ProductsPage } from './components/pages/ProductsPage';
+import { useAuth } from './modules/auth/hooks/useAuth';
+import { LoginPage } from './modules/auth/components/LoginPage';
+import { DashboardLayout } from './shared/components/layout/DashboardLayout';
+import { Dashboard } from './modules/dashboard/components/Dashboard';
+import { ProductsPage } from './modules/products/components/ProductsPage';
 import { IntegratedProductsPage } from './components/pages/IntegratedProductsPage';
 import { ProductDetailPage } from './components/pages/ProductDetailPage';
 import { AcronisDetailPage } from './components/pages/AcronisDetailPage';
 import { IntegrationWindow } from './components/modals/IntegrationWindow';
 import { AlertManagementPage } from './components/pages/AlertManagementPage';
 import { UserManagementPage } from './components/pages/UserManagementPage';
-import { Page, ProductDetail, IntegrationProduct } from './types';
+import { Page, ProductDetail, IntegrationProduct } from './shared/types';
 
 export default function App() {
   const { isAuthenticated, user, isLoading, login, logout } = useAuth();

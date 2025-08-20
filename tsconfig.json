@@ -18,14 +18,14 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@/components/*": ["./src/components/*"],
-      "@/lib/*": ["./src/lib/*"],
-      "@/utils/*": ["./src/utils/*"],
-      "@/types/*": ["./src/types/*"],
-      "@/constants/*": ["./src/constants/*"],
-      "@/hooks/*": ["./src/hooks/*"],
-      "@/services/*": ["./src/services/*"],
-      "@/data/*": ["./src/data/*"]
+      "@/shared/*": ["./src/shared/*"],
+      "@/modules/*": ["./src/modules/*"],
+      "@/auth/*": ["./src/modules/auth/*"],
+      "@/dashboard/*": ["./src/modules/dashboard/*"],
+      "@/products/*": ["./src/modules/products/*"],
+      "@/alerts/*": ["./src/modules/alerts/*"],
+      "@/users/*": ["./src/modules/users/*"],
+      "@/acronis/*": ["./src/modules/acronis/*"]
     }
   },
   "include": [

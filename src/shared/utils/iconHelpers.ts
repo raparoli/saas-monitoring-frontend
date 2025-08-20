@@ -9,7 +9,6 @@ import {
   AlertTriangle
 } from 'lucide-react';
 
-// Icon mapping functions
 export const getCategoryIcon = (category: string) => {
   switch (category) {
     case 'Security': return Shield;
