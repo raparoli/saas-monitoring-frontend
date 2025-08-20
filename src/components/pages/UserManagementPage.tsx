@@ -28,14 +28,8 @@ export function UserManagementPage() {
 
   // API integration
   const { data: users = [], loading, error, refetch } = useApi(
-    () => apiService.getUsers({
-      search: searchTerm,
-      role: roleFilter,
-      status: statusFilter
-    }),
-    {
-      immediate: true
-    }
+    apiService.getUsers,
+    { immediate: true }
   );
 
   // Filtered users

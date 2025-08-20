@@ -34,13 +34,8 @@ export function ProductsPage({ onStartIntegration }: ProductsPageProps) {
 
   // API integration
   const { data: products = [], loading, error, refetch } = useApi(
-    () => apiService.getAvailableProducts({
-      search: searchTerm,
-      category: selectedCategory
-    }),
-    {
-      immediate: true
-    }
+    apiService.getAvailableProducts,
+    { immediate: true }
   );
 
   const getComplexityBadgeColor = (complexity: string) => {

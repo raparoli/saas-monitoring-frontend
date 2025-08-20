@@ -55,13 +55,13 @@ export function IntegratedProductsPage({ onViewDetails, onAcronisDetail, onStart
   
   // API integration for integrated products
   const { data: integratedProducts = [], loading: integratedLoading, error: integratedError, refetch: refetchIntegrated } = useApi(
-    () => apiService.getIntegratedProducts(),
+    apiService.getIntegratedProducts,
     { immediate: true }
   );
 
   // API integration for available products
   const { data: availableProductsData = [], loading: availableLoading, error: availableError, refetch: refetchAvailable } = useApi(
-    () => apiService.getAvailableProducts({ search: searchTerm }),
+    apiService.getAvailableProducts,
     { immediate: true }
   );
 

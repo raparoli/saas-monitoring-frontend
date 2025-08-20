@@ -56,13 +56,13 @@ class ApiService {
   }
 
   // Users
-  async getUsers(params?: {
+  async getUsers(params: {
     search?: string;
     role?: string;
     status?: string;
     page?: number;
     limit?: number;
-  }): Promise<ApiResponse<User[]>> {
+  } = {}): Promise<ApiResponse<User[]>> {
     await delay(800);
     
     let filteredUsers = [...mockUsers];
@@ -138,7 +138,7 @@ class ApiService {
   }
 
   // Alert Email Logs
-  async getAlertEmailLogs(params?: {
+  async getAlertEmailLogs(params: {
     search?: string;
     severity?: string;
     category?: string;
@@ -147,7 +147,7 @@ class ApiService {
     dateRange?: string;
     page?: number;
     limit?: number;
-  }): Promise<ApiResponse<AlertEmailLog[]>> {
+  } = {}): Promise<ApiResponse<AlertEmailLog[]>> {
     await delay(1200);
     
     let filteredAlerts = [...mockAlertEmailLogs];
@@ -201,10 +201,10 @@ class ApiService {
   }
 
   // Products
-  async getAvailableProducts(params?: {
+  async getAvailableProducts(params: {
     search?: string;
     category?: string;
-  }): Promise<ApiResponse<IntegrationProduct[]>> {
+  } = {}): Promise<ApiResponse<IntegrationProduct[]>> {
     await delay(600);
     
     let filteredProducts = [...mockProducts];

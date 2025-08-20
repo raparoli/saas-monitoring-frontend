@@ -13,7 +13,7 @@ interface UseApiOptions {
 }
 
 export function useApi<T>(
-  apiCall: () => Promise<{ data: T; success: boolean; message?: string }>,
+  apiCall: (() => Promise<{ data: T; success: boolean; message?: string }>) | Promise<{ data: T; success: boolean; message?: string }>,
   options: UseApiOptions = {}
 ) {
   const [state, setState] = useState<UseApiState<T>>({
@@ -26,7 +26,7 @@ export function useApi<T>(
     setState(prev => ({ ...prev, loading: true, error: null }));
     
     try {
-      const response = await apiCall();
+      const response = typeof apiCall === 'function' ? await apiCall() : await apiCall;
       
       if (response.success) {
         setState({
@@ -54,13 +54,13 @@ export function useApi<T>(
         options.onError(errorMessage);
       }
     }
-  }, [apiCall, options]);
+  }, []);
 
   useEffect(() => {
     if (options.immediate !== false) {
       execute();
     }
-  }, [execute, options.immediate]);
+  }, [execute]);
 
   const refetch = useCallback(() => {
     execute();

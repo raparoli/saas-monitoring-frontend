@@ -50,19 +50,8 @@ export function AlertManagementPage() {
 
   // API integration
   const { data: alertsData, loading, error, refetch } = useApi(
-    () => apiService.getAlertEmailLogs({
-      search: searchTerm,
-      severity: severityFilter,
-      category: categoryFilter,
-      emailStatus: emailStatusFilter,
-      product: productFilter,
-      dateRange: dateRangeFilter,
-      page: currentPage,
-      limit: itemsPerPage
-    }),
-    {
-      immediate: true
-    }
+    apiService.getAlertEmailLogs,
+    { immediate: true }
   );
 
   const alerts = alertsData || [];

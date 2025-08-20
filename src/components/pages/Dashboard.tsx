@@ -48,10 +48,8 @@ interface DashboardProps {
 export function Dashboard({ onAcronisDetail }: DashboardProps) {
   // API integration
   const { data: dashboardData, loading, error, refetch } = useApi(
-    () => apiService.getDashboardStats(),
-    {
-      immediate: true
-    }
+    apiService.getDashboardStats,
+    { immediate: true }
   );
 
   // Global Summary Data
