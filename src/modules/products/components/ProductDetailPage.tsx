@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../shared/components/ui/card';
-import { Button } from '../../shared/components/ui/button';
-import { Badge } from '../../shared/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../shared/components/ui/tabs';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../shared/components/ui/table';
-import { Progress } from '../../shared/components/ui/progress';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../shared/components/ui/card';
+import { Button } from '../../../shared/components/ui/button';
+import { Badge } from '../../../shared/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../../shared/components/ui/tabs';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../shared/components/ui/table';
+import { Progress } from '../../../shared/components/ui/progress';
 import { ArrowLeft, Cloud, Shield, Calendar, Users, Activity, AlertTriangle } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { ProductDetail } from '../../shared/types';
+import { ProductDetail } from '../../../shared/types';
 
 // Helper function for severity badge variant
 function getSeverityBadgeVariant(severity: string) {
@@ -26,6 +26,22 @@ interface ProductDetailPageProps {
 export function ProductDetailPage({ product, onBack }: ProductDetailPageProps) {
   const [activeTab, setActiveTab] = useState('overview');
 
+  // Ensure product exists and has required properties
+  if (!product || typeof product !== 'object') {
+    return (
+      <div className="flex-1 p-6 flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold mb-2">Product Not Found</h2>
+          <p className="text-muted-foreground mb-4">The requested product could not be loaded.</p>
+          <Button onClick={onBack}>
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Go Back
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   // Mock data for charts and tables
   const usageOverTime = [
     { month: 'Jan', usage: 420 },
@@ -37,8 +53,8 @@ export function ProductDetailPage({ product, onBack }: ProductDetailPageProps) {
   ];
 
   const licenseDistribution = [
-    { name: 'Used', value: product.usedLicenses, color: 'hsl(var(--primary))' },
-    { name: 'Available', value: product.totalLicenses - product.usedLicenses, color: 'hsl(var(--muted))' },
+    { name: 'Used', value: product.usedLicenses || 0, color: 'hsl(var(--primary))' },
+    { name: 'Available', value: (product.totalLicenses || 0) - (product.usedLicenses || 0), color: 'hsl(var(--muted))' },
   ];
 
   const alerts = [
@@ -66,8 +82,8 @@ export function ProductDetailPage({ product, onBack }: ProductDetailPageProps) {
     { id: 5, name: 'Tom Brown', email: 'tom@company.com', department: 'Finance', lastActive: '2024-08-05', status: 'Active' },
   ];
 
-  const usagePercentage = Math.round((product.usedLicenses / product.totalLicenses) * 100);
-  const availableLicenses = product.totalLicenses - product.usedLicenses;
+  const usagePercentage = Math.round(((product.usedLicenses || 0) / (product.totalLicenses || 1)) * 100);
+  const availableLicenses = (product.totalLicenses || 0) - (product.usedLicenses || 0);
 
   return (
     <div className="flex-1 p-6 space-y-6">
@@ -79,19 +95,19 @@ export function ProductDetailPage({ product, onBack }: ProductDetailPageProps) {
         </Button>
         <div className="flex items-center space-x-3">
           <div className="flex items-center justify-center w-12 h-12 bg-primary/10 rounded-lg">
-            {product.name.includes('Microsoft') ? (
+            {(product.name || '').includes('Microsoft') ? (
               <Cloud className="w-6 h-6 text-primary" />
             ) : (
               <Shield className="w-6 h-6 text-primary" />
             )}
           </div>
           <div>
-            <h1 className="text-3xl font-semibold">{product.name}</h1>
-            <p className="text-muted-foreground">{product.licenseType}</p>
+            <h1 className="text-3xl font-semibold">{product.name || 'Unknown Product'}</h1>
+            <p className="text-muted-foreground">{product.licenseType || 'Unknown License Type'}</p>
           </div>
         </div>
         <Badge variant="default" className="ml-auto">
-          {product.status}
+          {product.status || 'Unknown'}
         </Badge>
       </div>
 
@@ -113,9 +129,9 @@ export function ProductDetailPage({ product, onBack }: ProductDetailPageProps) {
                 <Shield className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{product.totalLicenses}</div>
+                <div className="text-2xl font-bold">{product.totalLicenses || 0}</div>
                 <p className="text-xs text-muted-foreground">
-                  {product.licenseType}
+                  {product.licenseType || 'Unknown Type'}
                 </p>
               </CardContent>
             </Card>
@@ -126,7 +142,7 @@ export function ProductDetailPage({ product, onBack }: ProductDetailPageProps) {
                 <Users className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{product.usedLicenses}</div>
+                <div className="text-2xl font-bold">{product.usedLicenses || 0}</div>
                 <p className="text-xs text-muted-foreground">
                   {usagePercentage}% utilization
                 </p>
@@ -157,7 +173,7 @@ export function ProductDetailPage({ product, onBack }: ProductDetailPageProps) {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-sm">Used</span>
-                    <span className="text-sm font-medium">{product.usedLicenses}/{product.totalLicenses}</span>
+                    <span className="text-sm font-medium">{product.usedLicenses || 0}/{product.totalLicenses || 0}</span>
                   </div>
                   <Progress value={usagePercentage} className="h-2" />
                 </div>
@@ -181,20 +197,20 @@ export function ProductDetailPage({ product, onBack }: ProductDetailPageProps) {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">License Type</span>
-                    <span className="text-sm font-medium">{product.licenseType}</span>
+                    <span className="text-sm font-medium">{product.licenseType || 'Unknown'}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">Renewal Date</span>
                     <div className="flex items-center space-x-1">
                       <Calendar className="w-4 h-4 text-muted-foreground" />
                       <span className="text-sm font-medium">
-                        {new Date(product.renewalDate).toLocaleDateString()}
+                        {product.renewalDate ? new Date(product.renewalDate).toLocaleDateString() : 'Unknown'}
                       </span>
                     </div>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">Status</span>
-                    <Badge variant="default">{product.status}</Badge>
+                    <Badge variant="default">{product.status || 'Unknown'}</Badge>
                   </div>
                 </div>
               </CardContent>

@@ -1,8 +1,8 @@
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../shared/components/ui/card';
-import { Badge } from '../../shared/components/ui/badge';
-import { Progress } from '../../shared/components/ui/progress';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../../shared/components/ui/tooltip';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../shared/components/ui/card';
+import { Badge } from '../../../shared/components/ui/badge';
+import { Progress } from '../../../shared/components/ui/progress';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../../../shared/components/ui/tooltip';
 import {
   Shield,
   Users,
@@ -30,8 +30,8 @@ import {
   workloadUtilization, 
   topCustomers, 
   alertSeverityData 
-} from './constants';
-import { formatStorageGB } from './utils';
+} from '../constants';
+import { formatStorageGB } from '../utils';
 
 export function OverviewTab() {
   return (
@@ -112,14 +112,24 @@ export function OverviewTab() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="font-medium">License Utilization</h4>
+                  <h4 className="font-medium">Overall License Utilization</h4>
                   <p className="text-sm text-muted-foreground">
                     {licenseData.usedLicenses} / {licenseData.totalLicenses} licenses in use
                   </p>
                 </div>
-                <Badge variant={licenseData.utilizationPercentage >= 90 ? 'destructive' : 'default'}>
-                  {licenseData.utilizationPercentage}%
-                </Badge>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Badge 
+                      variant={licenseData.utilizationPercentage >= 95 ? 'destructive' : 'secondary'}
+                      className="cursor-help"
+                    >
+                      {licenseData.utilizationPercentage}% Utilized
+                    </Badge>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>High utilization. Consider increasing quota.</p>
+                  </TooltipContent>
+                </Tooltip>
               </div>
               <Progress value={licenseData.utilizationPercentage} className="h-3" />
               {licenseData.utilizationPercentage >= 90 && (

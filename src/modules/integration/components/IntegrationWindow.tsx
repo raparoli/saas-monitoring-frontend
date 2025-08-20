@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../../shared/components/ui/dialog';
-import { Button } from '../../shared/components/ui/button';
-import { Input } from '../../shared/components/ui/input';
-import { Label } from '../../shared/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../shared/components/ui/card';
-import { Progress } from '../../shared/components/ui/progress';
-import { Badge } from '../../shared/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../shared/components/ui/select';
-import { Checkbox } from '../../shared/components/ui/checkbox';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../../../shared/components/ui/dialog';
+import { Button } from '../../../shared/components/ui/button';
+import { Input } from '../../../shared/components/ui/input';
+import { Label } from '../../../shared/components/ui/label';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../shared/components/ui/card';
+import { Progress } from '../../../shared/components/ui/progress';
+import { Badge } from '../../../shared/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../shared/components/ui/select';
+import { Checkbox } from '../../../shared/components/ui/checkbox';
 import { 
   X, 
   ArrowRight, 
@@ -20,9 +20,9 @@ import {
   HardDrive,
   Cloud
 } from 'lucide-react';
-import { IntegrationProduct, IntegrationStep } from '../../shared/types';
-import { INTEGRATION_REQUIREMENTS } from '../../shared/constants';
-import { getProductIcon } from '../../shared/utils/iconHelpers';
+import { IntegrationProduct, IntegrationStep } from '../../../shared/types';
+import { INTEGRATION_REQUIREMENTS } from '../../../shared/constants';
+import { getProductIcon } from '../../../shared/utils/iconHelpers';
 
 interface IntegrationWindowProps {
   product: IntegrationProduct;
@@ -104,8 +104,8 @@ export function IntegrationWindow({ product, onClose, onComplete }: IntegrationW
     }));
   };
 
-  const Icon = getProductIcon(product.name);
-  const requirements = INTEGRATION_REQUIREMENTS[product.id as keyof typeof INTEGRATION_REQUIREMENTS] || {
+  const Icon = getProductIcon(product?.name || '');
+  const requirements = INTEGRATION_REQUIREMENTS[(product?.id || '') as keyof typeof INTEGRATION_REQUIREMENTS] || {
     credentials: ['API Key'],
     permissions: ['Basic access'],
     requirements: ['Active account']
@@ -121,8 +121,8 @@ export function IntegrationWindow({ product, onClose, onComplete }: IntegrationW
                 <Icon className="w-8 h-8 text-primary" />
               </div>
               <div>
-                <h3 className="text-xl font-semibold">{product.name}</h3>
-                <p className="text-muted-foreground">{product.category}</p>
+                <h3 className="text-xl font-semibold">{product?.name || 'Unknown Product'}</h3>
+                <p className="text-muted-foreground">{product?.category || 'Unknown Category'}</p>
                 <Badge variant="secondary" className="mt-1">Ready to integrate</Badge>
               </div>
             </div>
@@ -131,7 +131,7 @@ export function IntegrationWindow({ product, onClose, onComplete }: IntegrationW
               <div>
                 <h4 className="font-medium mb-2">What you'll need:</h4>
                 <ul className="space-y-1">
-                  {requirements.credentials.map((cred, index) => (
+                  {(requirements.credentials || []).map((cred, index) => (
                     <li key={index} className="flex items-center text-sm text-muted-foreground">
                       <Key className="w-4 h-4 mr-2" />
                       {cred}
@@ -143,7 +143,7 @@ export function IntegrationWindow({ product, onClose, onComplete }: IntegrationW
               <div>
                 <h4 className="font-medium mb-2">Required permissions:</h4>
                 <ul className="space-y-1">
-                  {requirements.permissions.map((permission, index) => (
+                  {(requirements.permissions || []).map((permission, index) => (
                     <li key={index} className="flex items-center text-sm text-muted-foreground">
                       <Shield className="w-4 h-4 mr-2" />
                       {permission}
@@ -155,7 +155,7 @@ export function IntegrationWindow({ product, onClose, onComplete }: IntegrationW
               <div>
                 <h4 className="font-medium mb-2">Prerequisites:</h4>
                 <ul className="space-y-1">
-                  {requirements.requirements.map((req, index) => (
+                  {(requirements.requirements || []).map((req, index) => (
                     <li key={index} className="flex items-center text-sm text-muted-foreground">
                       <Info className="w-4 h-4 mr-2" />
                       {req}
@@ -172,7 +172,7 @@ export function IntegrationWindow({ product, onClose, onComplete }: IntegrationW
                   <div>
                     <p className="text-sm text-blue-800">
                       This integration will sync data every {formData.syncFrequency} hours and provide 
-                      real-time monitoring of your {product.name} licenses and usage.
+                      real-time monitoring of your {product?.name || 'product'} licenses and usage.
                     </p>
                   </div>
                 </div>
@@ -187,20 +187,20 @@ export function IntegrationWindow({ product, onClose, onComplete }: IntegrationW
             <div>
               <h3 className="text-lg font-semibold mb-2">API Credentials</h3>
               <p className="text-muted-foreground">
-                Enter your {product.name} API credentials to establish the connection.
+                Enter your {product?.name || 'product'} API credentials to establish the connection.
               </p>
             </div>
 
             <div className="space-y-4">
-              {product.id === 'microsoft' && (
+              {(product?.id || '') === 'microsoft' && (
                 <>
                   <div className="space-y-2">
                     <Label htmlFor="apiKey">Application ID</Label>
                     <Input
                       id="apiKey"
                       placeholder="Enter your Azure Application ID"
-                      value={formData.apiKey}
-                      onChange={(e) => updateFormData('apiKey', e.target.value)}
+                      value={formData.apiKey || ''}
+                      onChange={(e) => updateFormData('apiKey', e.target.value || '')}
                     />
                   </div>
                   <div className="space-y-2">
@@ -209,8 +209,8 @@ export function IntegrationWindow({ product, onClose, onComplete }: IntegrationW
                       id="apiSecret"
                       type="password"
                       placeholder="Enter your client secret"
-                      value={formData.apiSecret}
-                      onChange={(e) => updateFormData('apiSecret', e.target.value)}
+                      value={formData.apiSecret || ''}
+                      onChange={(e) => updateFormData('apiSecret', e.target.value || '')}
                     />
                   </div>
                   <div className="space-y-2">
@@ -218,22 +218,22 @@ export function IntegrationWindow({ product, onClose, onComplete }: IntegrationW
                     <Input
                       id="organizationId"
                       placeholder="Enter your Azure Tenant ID"
-                      value={formData.organizationId}
-                      onChange={(e) => updateFormData('organizationId', e.target.value)}
+                      value={formData.organizationId || ''}
+                      onChange={(e) => updateFormData('organizationId', e.target.value || '')}
                     />
                   </div>
                 </>
               )}
 
-              {product.id === 'bitdefender' && (
+              {(product?.id || '') === 'bitdefender' && (
                 <>
                   <div className="space-y-2">
                     <Label htmlFor="apiKey">API Key</Label>
                     <Input
                       id="apiKey"
                       placeholder="Enter your GravityZone API key"
-                      value={formData.apiKey}
-                      onChange={(e) => updateFormData('apiKey', e.target.value)}
+                      value={formData.apiKey || ''}
+                      onChange={(e) => updateFormData('apiKey', e.target.value || '')}
                     />
                   </div>
                   <div className="space-y-2">
@@ -241,22 +241,22 @@ export function IntegrationWindow({ product, onClose, onComplete }: IntegrationW
                     <Input
                       id="organizationId"
                       placeholder="Enter your company ID"
-                      value={formData.organizationId}
-                      onChange={(e) => updateFormData('organizationId', e.target.value)}
+                      value={formData.organizationId || ''}
+                      onChange={(e) => updateFormData('organizationId', e.target.value || '')}
                     />
                   </div>
                 </>
               )}
 
-              {product.id === 'acronis' && (
+              {(product?.id || '') === 'acronis' && (
                 <>
                   <div className="space-y-2">
                     <Label htmlFor="apiKey">API Key</Label>
                     <Input
                       id="apiKey"
                       placeholder="Enter your Acronis API key"
-                      value={formData.apiKey}
-                      onChange={(e) => updateFormData('apiKey', e.target.value)}
+                      value={formData.apiKey || ''}
+                      onChange={(e) => updateFormData('apiKey', e.target.value || '')}
                     />
                   </div>
                   <div className="space-y-2">
@@ -264,8 +264,8 @@ export function IntegrationWindow({ product, onClose, onComplete }: IntegrationW
                     <Input
                       id="serverUrl"
                       placeholder="https://your-server.acronis.com"
-                      value={formData.serverUrl}
-                      onChange={(e) => updateFormData('serverUrl', e.target.value)}
+                      value={formData.serverUrl || ''}
+                      onChange={(e) => updateFormData('serverUrl', e.target.value || '')}
                     />
                   </div>
                 </>
@@ -291,8 +291,8 @@ export function IntegrationWindow({ product, onClose, onComplete }: IntegrationW
                   id="licenseCount"
                   type="number"
                   placeholder="Enter number of licenses"
-                  value={formData.licenseCount}
-                  onChange={(e) => updateFormData('licenseCount', e.target.value)}
+                  value={formData.licenseCount || ''}
+                  onChange={(e) => updateFormData('licenseCount', e.target.value || '')}
                 />
                 <p className="text-xs text-muted-foreground">
                   This helps us monitor your license utilization
@@ -302,8 +302,8 @@ export function IntegrationWindow({ product, onClose, onComplete }: IntegrationW
               <div className="space-y-2">
                 <Label htmlFor="syncFrequency">Sync Frequency</Label>
                 <Select 
-                  value={formData.syncFrequency} 
-                  onValueChange={(value) => updateFormData('syncFrequency', value)}
+                  value={formData.syncFrequency || '24'} 
+                  onValueChange={(value) => updateFormData('syncFrequency', value || '24')}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select sync frequency" />
@@ -323,7 +323,7 @@ export function IntegrationWindow({ product, onClose, onComplete }: IntegrationW
                   <Checkbox 
                     id="autoSync" 
                     checked={formData.autoSync}
-                    onCheckedChange={(checked) => updateFormData('autoSync', checked)}
+                    onCheckedChange={(checked) => updateFormData('autoSync', !!checked)}
                   />
                   <Label htmlFor="autoSync">Enable automatic synchronization</Label>
                 </div>
@@ -332,7 +332,7 @@ export function IntegrationWindow({ product, onClose, onComplete }: IntegrationW
                   <Checkbox 
                     id="enableAlerts" 
                     checked={formData.enableAlerts}
-                    onCheckedChange={(checked) => updateFormData('enableAlerts', checked)}
+                    onCheckedChange={(checked) => updateFormData('enableAlerts', !!checked)}
                   />
                   <Label htmlFor="enableAlerts">Enable usage alerts and notifications</Label>
                 </div>
@@ -417,7 +417,7 @@ export function IntegrationWindow({ product, onClose, onComplete }: IntegrationW
                   <div className="flex items-center space-x-4">
                     <Loader2 className="w-8 h-8 animate-spin text-primary" />
                     <div>
-                      <h4 className="font-medium">Connecting to {product.name}...</h4>
+                      <h4 className="font-medium">Connecting to {product?.name || 'product'}...</h4>
                       <p className="text-sm text-muted-foreground">
                         This may take a few moments
                       </p>
@@ -475,7 +475,7 @@ export function IntegrationWindow({ product, onClose, onComplete }: IntegrationW
             <div>
               <h3 className="text-xl font-semibold mb-2">Integration Complete!</h3>
               <p className="text-muted-foreground">
-                {product.name} has been successfully integrated with your SaaS monitoring platform.
+                {product?.name || 'Product'} has been successfully integrated with your SaaS monitoring platform.
               </p>
             </div>
 
@@ -484,11 +484,11 @@ export function IntegrationWindow({ product, onClose, onComplete }: IntegrationW
                 <div className="space-y-3">
                   <div className="flex items-center justify-between text-sm">
                     <span>Product:</span>
-                    <span className="font-medium">{product.name}</span>
+                    <span className="font-medium">{product?.name || 'Unknown'}</span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
                     <span>Sync Frequency:</span>
-                    <span className="font-medium">Every {formData.syncFrequency} hours</span>
+                    <span className="font-medium">Every {formData.syncFrequency || '24'} hours</span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
                     <span>Expected Licenses:</span>
@@ -520,9 +520,9 @@ export function IntegrationWindow({ product, onClose, onComplete }: IntegrationW
         <DialogHeader>
           <div className="flex items-center justify-between">
             <div>
-              <DialogTitle>Integrate {product.name}</DialogTitle>
+              <DialogTitle>Integrate {product?.name || 'Product'}</DialogTitle>
               <DialogDescription>
-                Step {getCurrentStepIndex() + 1} of {steps.length}: {steps[getCurrentStepIndex()].description}
+                Step {getCurrentStepIndex() + 1} of {steps.length}: {steps[getCurrentStepIndex()]?.description || 'Unknown step'}
               </DialogDescription>
             </div>
             <Button variant="ghost" size="icon" onClick={onClose}>

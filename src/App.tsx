@@ -4,12 +4,12 @@ import { LoginPage } from './modules/auth/components/LoginPage';
 import { DashboardLayout } from './shared/components/layout/DashboardLayout';
 import { Dashboard } from './modules/dashboard/components/Dashboard';
 import { ProductsPage } from './modules/products/components/ProductsPage';
-import { IntegratedProductsPage } from './components/pages/IntegratedProductsPage';
-import { ProductDetailPage } from './components/pages/ProductDetailPage';
-import { AcronisDetailPage } from './components/pages/AcronisDetailPage';
-import { IntegrationWindow } from './components/modals/IntegrationWindow';
-import { AlertManagementPage } from './components/pages/AlertManagementPage';
-import { UserManagementPage } from './components/pages/UserManagementPage';
+import { IntegratedProductsPage } from './modules/products/components/IntegratedProductsPage';
+import { ProductDetailPage } from './modules/products/components/ProductDetailPage';
+import { AcronisDetailPage } from './modules/acronis/components/AcronisDetailPage';
+import { IntegrationWindow } from './modules/integration/components/IntegrationWindow';
+import { AlertManagementPage } from './modules/alerts/components/AlertManagementPage';
+import { UserManagementPage } from './modules/users/components/UserManagementPage';
 import { Page, ProductDetail, IntegrationProduct } from './shared/types';
 
 export default function App() {

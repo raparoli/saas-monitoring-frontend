@@ -1,5 +1,5 @@
-import { Customer, Alert, SortField, SortDirection, EnhancedCustomerData } from './types';
-import { customers, licenseData, alertSeverityData } from './constants';
+import { Customer, Alert, SortField, SortDirection, EnhancedCustomerData } from '../types';
+import { customers, licenseData, alertSeverityData } from '../constants';
 import { AlertOctagon, XCircle, AlertTriangle, Info, AlertCircle, TrendingUp, TrendingDown } from 'lucide-react';
 
 // Helper functions
@@ -30,14 +30,6 @@ export const getSeverityStats = () => {
     percentage: Math.round((item.value / total) * 100)
   }));
 };
-
-// export const getTrendIcon = (trend: string) => {
-//   switch (trend) {
-//     case 'up': return <TrendingUp className="w-4 h-4 text-green-500" />;
-//     case 'down': return <TrendingDown className="w-4 h-4 text-red-500" />;
-//     default: return <div className="w-4 h-4" />;
-//   }
-// };
 
 export const formatStorageGB = (gb: number) => {
   if (gb >= 1000) {

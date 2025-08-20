@@ -1,13 +1,13 @@
 import React, { useState, useMemo } from 'react';
-import { useApi } from '../../shared/hooks/useApi';
-import { apiService } from '../../shared/services/api';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../shared/components/ui/card';
-import { Button } from '../../shared/components/ui/button';
-import { Badge } from '../../shared/components/ui/badge';
-import { Input } from '../../shared/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../shared/components/ui/select';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../shared/components/ui/table';
-import { Avatar, AvatarFallback, AvatarImage } from '../../shared/components/ui/avatar';
+import { useApi } from '../../../shared/hooks/useApi';
+import { apiService } from '../../../shared/services/api';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../shared/components/ui/card';
+import { Button } from '../../../shared/components/ui/button';
+import { Badge } from '../../../shared/components/ui/badge';
+import { Input } from '../../../shared/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../shared/components/ui/select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../shared/components/ui/table';
+import { Avatar, AvatarFallback, AvatarImage } from '../../../shared/components/ui/avatar';
 import {
   Users,
   Edit,
@@ -17,8 +17,8 @@ import {
   Filter,
   RefreshCw
 } from 'lucide-react';
-import { User } from '../../shared/types';
-import { getRoleBadgeColor, getInitials } from '../../shared/utils';
+import { User } from '../../../shared/types';
+import { getRoleBadgeColor, getInitials } from '../../../shared/utils';
 
 export function UserManagementPage() {
   // State management
@@ -33,15 +33,15 @@ export function UserManagementPage() {
   );
 
   // Ensure safe array
-  const safeUsers = Array.isArray(users) ? users : [];
+  const safeUsers = (users && Array.isArray(users)) ? users : [];
 
   // Filtered users
   const filteredUsers = useMemo(() => {
-    return safeUsers.filter(user => {
+    return (safeUsers || []).filter(user => {
       if (!user || typeof user !== 'object' || user === null) return false;
       const matchesSearch = 
-        (user.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (user.email || '').toLowerCase().includes(searchTerm.toLowerCase());
+        (user.name || '').toLowerCase().includes((searchTerm || '').toLowerCase()) ||
+        (user.email || '').toLowerCase().includes((searchTerm || '').toLowerCase());
       
       const matchesRole = roleFilter === 'All' || (user.role || '') === roleFilter;
       const matchesStatus = statusFilter === 'All' || (user.status || '') === statusFilter;
@@ -94,13 +94,13 @@ export function UserManagementPage() {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Search by name or email..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  value={searchTerm || ''}
+                  onChange={(e) => setSearchTerm(e.target.value || '')}
                   className="pl-10 bg-white shadow-sm"
                 />
               </div>
               
-              <Select value={roleFilter} onValueChange={setRoleFilter}>
+              <Select value={roleFilter || 'All'} onValueChange={setRoleFilter}>
                 <SelectTrigger className="w-full sm:w-48 bg-white shadow-sm">
                   <SelectValue placeholder="Role" />
                 </SelectTrigger>
@@ -112,7 +112,7 @@ export function UserManagementPage() {
                 </SelectContent>
               </Select>
 
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <Select value={statusFilter || 'All'} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-full sm:w-48 bg-white shadow-sm">
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
@@ -164,7 +164,7 @@ export function UserManagementPage() {
         <Card className="border bg-white">
         <CardHeader>
           <CardTitle className="text-base font-medium">
-            Users ({filteredUsers.length})
+            Users ({(filteredUsers || []).length})
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">

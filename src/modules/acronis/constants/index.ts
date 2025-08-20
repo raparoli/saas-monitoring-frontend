@@ -1,4 +1,4 @@
-import { Customer, Alert, LicenseEdition, CustomerUsageDetail, Usage } from './types';
+import { Customer, Alert, LicenseEdition, CustomerUsageDetail, Usage } from '../types';
 import { Server, Monitor, Laptop } from 'lucide-react';
 
 // Constants

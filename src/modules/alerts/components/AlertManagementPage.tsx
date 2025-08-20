@@ -1,15 +1,15 @@
 import React, { useState, useMemo } from 'react';
-import { useApi } from '../../shared/hooks/useApi';
-import { apiService } from '../../shared/services/api';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../shared/components/ui/card';
-import { Button } from '../../shared/components/ui/button';
-import { Badge } from '../../shared/components/ui/badge';
-import { Input } from '../../shared/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../shared/components/ui/select';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../shared/components/ui/table';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../../shared/components/ui/dialog';
-import { ScrollArea } from '../../shared/components/ui/scroll-area';
-import { Separator } from '../../shared/components/ui/separator';
+import { useApi } from '../../../shared/hooks/useApi';
+import { apiService } from '../../../shared/services/api';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../shared/components/ui/card';
+import { Button } from '../../../shared/components/ui/button';
+import { Badge } from '../../../shared/components/ui/badge';
+import { Input } from '../../../shared/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../shared/components/ui/select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../shared/components/ui/table';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../../../shared/components/ui/dialog';
+import { ScrollArea } from '../../../shared/components/ui/scroll-area';
+import { Separator } from '../../../shared/components/ui/separator';
 import {
   Mail,
   CheckCircle,
@@ -27,14 +27,14 @@ import {
   Filter,
   RefreshCw
 } from 'lucide-react';
-import { AlertEmailLog } from '../../shared/types';
+import { AlertEmailLog } from '../../../shared/types';
 import { 
   formatDateTime,
   getSeverityBadgeVariant,
   getEmailStatusColor,
   getProductBadgeColor
-} from '../../shared/utils';
-import { getStatusIcon } from '../../shared/utils/iconHelpers';
+} from '../../../shared/utils';
+import { getStatusIcon } from '../../../shared/utils/iconHelpers';
 
 export function AlertManagementPage() {
   // State management
@@ -55,18 +55,18 @@ export function AlertManagementPage() {
   );
 
   // Ensure safe array
-  const alerts = Array.isArray(alertsData) ? alertsData : [];
+  const alerts = (alertsData && Array.isArray(alertsData)) ? alertsData : [];
   const itemsPerPage = 10;
 
   // Filtered data
   const filteredAlerts = useMemo(() => {
-    return alerts.filter(alert => {
+    return (alerts || []).filter(alert => {
       if (!alert || typeof alert !== 'object' || alert === null) return false;
       const matchesSearch = 
-        (alert.customerName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (alert.resourceName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (alert.alertId || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (alert.productName || '').toLowerCase().includes(searchTerm.toLowerCase());
+        (alert.customerName || '').toLowerCase().includes((searchTerm || '').toLowerCase()) ||
+        (alert.resourceName || '').toLowerCase().includes((searchTerm || '').toLowerCase()) ||
+        (alert.alertId || '').toLowerCase().includes((searchTerm || '').toLowerCase()) ||
+        (alert.productName || '').toLowerCase().includes((searchTerm || '').toLowerCase());
       
       const matchesSeverity = severityFilter === 'all' || (alert.severity || '') === severityFilter;
       const matchesCategory = categoryFilter === 'all' || (alert.category || '') === categoryFilter;
@@ -78,15 +78,15 @@ export function AlertManagementPage() {
   }, [alerts, searchTerm, severityFilter, categoryFilter, emailStatusFilter, productFilter]);
 
   // Pagination
-  const totalPages = Math.ceil(filteredAlerts.length / itemsPerPage);
-  const paginatedAlerts = filteredAlerts.slice(
+  const totalPages = Math.ceil((filteredAlerts || []).length / itemsPerPage);
+  const paginatedAlerts = (filteredAlerts || []).slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
 
   // Summary statistics
   const summaryStats = useMemo(() => {
-    const alertsArray = Array.isArray(alerts) ? alerts : [];
+    const alertsArray = (alerts && Array.isArray(alerts)) ? alerts : [];
     const totalEmailed = alertsArray.length;
     const failedEmails = alertsArray.filter(a => a && typeof a === 'object' && a !== null && (a.emailStatus || '') === 'Failed').length;
     const criticalSent = alertsArray.filter(a => a && typeof a === 'object' && a !== null && (a.severity || '') === 'Critical' && (a.emailStatus || '') === 'Sent').length;
@@ -253,13 +253,13 @@ export function AlertManagementPage() {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Search by Customer, Product, Resource, or Alert ID"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  value={searchTerm || ''}
+                  onChange={(e) => setSearchTerm(e.target.value || '')}
                   className="pl-10 bg-white shadow-sm"
                 />
               </div>
               
-              <Select value={dateRangeFilter} onValueChange={setDateRangeFilter}>
+              <Select value={dateRangeFilter || '7days'} onValueChange={setDateRangeFilter}>
                 <SelectTrigger className="w-full sm:w-48 bg-white shadow-sm">
                   <SelectValue placeholder="Date Range" />
                 </SelectTrigger>
@@ -271,7 +271,7 @@ export function AlertManagementPage() {
                 </SelectContent>
               </Select>
 
-              <Select value={productFilter} onValueChange={setProductFilter}>
+              <Select value={productFilter || 'all'} onValueChange={setProductFilter}>
                 <SelectTrigger className="w-full sm:w-48 bg-white shadow-sm">
                   <SelectValue placeholder="Product" />
                 </SelectTrigger>
@@ -284,7 +284,7 @@ export function AlertManagementPage() {
                 </SelectContent>
               </Select>
 
-              <Select value={severityFilter} onValueChange={setSeverityFilter}>
+              <Select value={severityFilter || 'all'} onValueChange={setSeverityFilter}>
                 <SelectTrigger className="w-full sm:w-48 bg-white shadow-sm">
                   <SelectValue placeholder="Severity" />
                 </SelectTrigger>
@@ -297,7 +297,7 @@ export function AlertManagementPage() {
                 </SelectContent>
               </Select>
 
-              <Select value={emailStatusFilter} onValueChange={setEmailStatusFilter}>
+              <Select value={emailStatusFilter || 'all'} onValueChange={setEmailStatusFilter}>
                 <SelectTrigger className="w-full sm:w-48 bg-white shadow-sm">
                   <SelectValue placeholder="Email Status" />
                 </SelectTrigger>
@@ -353,7 +353,7 @@ export function AlertManagementPage() {
             <div>
               <CardTitle>Alert Email Log</CardTitle>
               <CardDescription>
-                Showing {paginatedAlerts.length} of {filteredAlerts.length} alert email records
+                Showing {(paginatedAlerts || []).length} of {(filteredAlerts || []).length} alert email records
               </CardDescription>
             </div>
             <div className="flex items-center space-x-2">
@@ -384,7 +384,7 @@ export function AlertManagementPage() {
               <TableBody>
                 {(paginatedAlerts || []).map((alert) => {
                   if (!alert || typeof alert !== 'object' || alert === null) return null;
-                  const StatusIcon = getStatusIcon(alert.emailStatus);
+                  const StatusIcon = getStatusIcon(alert.emailStatus || '');
                   return (
                     <TableRow 
                       key={alert.id} 
@@ -445,7 +445,7 @@ export function AlertManagementPage() {
           {/* Pagination */}
           <div className="flex items-center justify-between p-4 border-t">
             <div className="text-sm text-muted-foreground">
-              Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, filteredAlerts.length)} of {filteredAlerts.length} results
+              Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, (filteredAlerts || []).length)} of {(filteredAlerts || []).length} results
             </div>
             <div className="flex items-center space-x-2">
               <Button
@@ -482,7 +482,7 @@ export function AlertManagementPage() {
               <span>Alert Email Details</span>
             </DialogTitle>
             <DialogDescription>
-              Comprehensive information about alert #{selectedAlert?.alertId}
+              Comprehensive information about alert #{selectedAlert?.alertId || 'Unknown'}
             </DialogDescription>
           </DialogHeader>
           

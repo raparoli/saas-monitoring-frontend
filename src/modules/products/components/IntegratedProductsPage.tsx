@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { useApi } from '../../shared/hooks/useApi';
-import { apiService } from '../../shared/services/api';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../shared/components/ui/card';
-import { Button } from '../../shared/components/ui/button';
-import { Badge } from '../../shared/components/ui/badge';
-import { Input } from '../../shared/components/ui/input';
-import { Progress } from '../../shared/components/ui/progress';
-import { Separator } from '../../shared/components/ui/separator';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../shared/components/ui/tooltip';
+import { useApi } from '../../../shared/hooks/useApi';
+import { apiService } from '../../../shared/services/api';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../shared/components/ui/card';
+import { Button } from '../../../shared/components/ui/button';
+import { Badge } from '../../../shared/components/ui/badge';
+import { Input } from '../../../shared/components/ui/input';
+import { Progress } from '../../../shared/components/ui/progress';
+import { Separator } from '../../../shared/components/ui/separator';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../../shared/components/ui/tooltip';
 import { 
   Eye, 
   Calendar, 
@@ -28,12 +28,12 @@ import {
   AlertTriangle,
   RefreshCw
 } from 'lucide-react';
-import { ProductDetail, IntegrationProduct } from '../../shared/types';
-import { PRODUCT_CATEGORIES } from '../../shared/constants';
+import { ProductDetail, IntegrationProduct } from '../../../shared/types';
+import { PRODUCT_CATEGORIES } from '../../../shared/constants';
 import { 
   getProductIcon,
   getCategoryIcon
-} from '../../shared/utils/iconHelpers';
+} from '../../../shared/utils/iconHelpers';
 import { 
   formatDate, 
   getDaysUntilRenewal, 
@@ -42,7 +42,7 @@ import {
   getUsageBadgeVariant,
   getComplexityColor,
   getProductGradient
-} from '../../shared/utils';
+} from '../../../shared/utils';
 
 interface IntegratedProductsPageProps {
   onViewDetails: (page: 'product-detail', product: ProductDetail) => void;
@@ -66,8 +66,8 @@ export function IntegratedProductsPage({ onViewDetails, onAcronisDetail, onStart
   );
 
   // Ensure we have safe arrays
-  const safeIntegratedProducts = Array.isArray(integratedProducts) ? integratedProducts : [];
-  const safeAvailableProductsData = Array.isArray(availableProductsData) ? availableProductsData : [];
+  const safeIntegratedProducts = (integratedProducts && Array.isArray(integratedProducts)) ? integratedProducts : [];
+  const safeAvailableProductsData = (availableProductsData && Array.isArray(availableProductsData)) ? availableProductsData : [];
 
   const mockIntegratedProducts: ProductDetail[] = [
     {
@@ -97,7 +97,7 @@ export function IntegratedProductsPage({ onViewDetails, onAcronisDetail, onStart
     return (product.name || '').toLowerCase().includes((searchTerm || '').toLowerCase());
   });
 
-  const availableProducts = safeAvailableProductsData.filter(p => p && typeof p === 'object' && p !== null && (p.status || '') === 'Available');
+  const availableProducts = (safeAvailableProductsData || []).filter(p => p && typeof p === 'object' && p !== null && (p.status || '') === 'Available');
 
   const getStatusBadge = (status: string) => {
     switch (status || '') {
@@ -148,8 +148,8 @@ export function IntegratedProductsPage({ onViewDetails, onAcronisDetail, onStart
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search products..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                value={searchTerm || ''}
+                onChange={(e) => setSearchTerm(e.target.value || '')}
                 className="pl-10 bg-white shadow-sm"
               />
             </div>
@@ -201,18 +201,18 @@ export function IntegratedProductsPage({ onViewDetails, onAcronisDetail, onStart
           </div>
 
           <div className="grid gap-6 lg:grid-cols-2">
-            {filteredProducts.map((product) => {
+            {(filteredProducts || []).map((product) => {
               if (!product || typeof product !== 'object') return null;
-              const usagePercentage = getUsagePercentage(product.usedLicenses, product.totalLicenses);
-              const daysUntilRenewal = getDaysUntilRenewal(product.renewalDate);
-              const IconComponent = getProductIcon(product.name);
+              const usagePercentage = getUsagePercentage(product.usedLicenses || 0, product.totalLicenses || 0);
+              const daysUntilRenewal = getDaysUntilRenewal(product.renewalDate || '');
+              const IconComponent = getProductIcon(product.name || '');
               const isHighUsage = usagePercentage >= 85;
               const isNearRenewal = daysUntilRenewal <= 30;
 
               return (
                 <Card 
                   key={product.id} 
-                  className={`relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-[1.02] cursor-pointer group ${getProductGradient(product.id)}`}
+                  className={`relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-[1.02] cursor-pointer group ${getProductGradient(product.id || '')}`}
                   onClick={() => handleViewDetails(product)}
                 >
                   <CardContent className="p-6">
@@ -286,7 +286,7 @@ export function IntegratedProductsPage({ onViewDetails, onAcronisDetail, onStart
                       
                       <div className="flex justify-between items-center">
                         <div>
-                          <p className="text-sm font-medium">{formatDate(product.renewalDate)}</p>
+                          <p className="text-sm font-medium">{formatDate(product.renewalDate || '')}</p>
                           <p className="text-xs text-muted-foreground">
                             {daysUntilRenewal > 0 ? `${daysUntilRenewal} days remaining` : 'Overdue'}
                           </p>
@@ -335,9 +335,9 @@ export function IntegratedProductsPage({ onViewDetails, onAcronisDetail, onStart
             <Badge className="bg-yellow-100 text-yellow-800">Ready to Integrate</Badge>
           </div>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {availableProducts.map((product) => {
+            {(availableProducts || []).map((product) => {
               if (!product || typeof product !== 'object') return null;
-              const IconComponent = getCategoryIcon(product.category);
+              const IconComponent = getCategoryIcon(product.category || '');
               return (
                 <Card key={product.id} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 group relative overflow-hidden">
                   {product.isPopular && (
