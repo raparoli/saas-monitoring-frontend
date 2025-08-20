@@ -1,7 +1,7 @@
 import React from 'react';
-import { Badge } from '../ui/badge';
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '../ui/sheet';
-import { Separator } from '../ui/separator';
+import { Badge } from '../../shared/components/ui/badge';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '../../shared/components/ui/sheet';
+import { Separator } from '../../shared/components/ui/separator';
 import {
   Database,
   Server,

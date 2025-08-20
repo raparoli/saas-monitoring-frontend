@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Button } from '../ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { Badge } from '../ui/badge';
-import { Separator } from '../ui/separator';
+import { Button } from '../../shared/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '../../shared/components/ui/avatar';
+import { Badge } from '../../shared/components/ui/badge';
+import { Separator } from '../../shared/components/ui/separator';
 import { 
   LogOut, 
   Bell,

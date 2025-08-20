@@ -1,8 +1,8 @@
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Badge } from '../ui/badge';
-import { Progress } from '../ui/progress';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../shared/components/ui/card';
+import { Badge } from '../../shared/components/ui/badge';
+import { Progress } from '../../shared/components/ui/progress';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../../shared/components/ui/tooltip';
 import {
   Shield,
   Users,

@@ -1,9 +1,9 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Badge } from '../ui/badge';
-import { Progress } from '../ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '../ui/sheet';
+import { Card, CardContent, CardHeader, CardTitle } from '../../shared/components/ui/card';
+import { Badge } from '../../shared/components/ui/badge';
+import { Progress } from '../../shared/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../shared/components/ui/tabs';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '../../shared/components/ui/sheet';
 import {
   Building,
   Database,
