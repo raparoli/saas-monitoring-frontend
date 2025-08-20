@@ -384,11 +384,3 @@ export function IntegratedProductsPage({ onViewDetails, onAcronisDetail, onStart
     </TooltipProvider>  
   );
 }
-
-function formatDate(dateString: string) {
-  return new Date(dateString).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric'
-  });
-}
