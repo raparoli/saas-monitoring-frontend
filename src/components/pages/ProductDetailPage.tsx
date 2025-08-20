@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { Progress } from '../ui/progress';
 import { ArrowLeft, Cloud, Shield, Calendar, Users, Activity, AlertTriangle } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { ProductDetail } from '../../types';
+import { ProductDetail } from '../../shared/types';
 
 interface ProductDetailPageProps {
   product: ProductDetail;

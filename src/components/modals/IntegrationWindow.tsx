@@ -20,9 +20,9 @@ import {
   HardDrive,
   Cloud
 } from 'lucide-react';
-import { IntegrationProduct, IntegrationStep } from '../../types';
-import { INTEGRATION_REQUIREMENTS } from '../../constants';
-import { getProductIcon } from '../../lib/icons';
+import { IntegrationProduct, IntegrationStep } from '../../shared/types';
+import { INTEGRATION_REQUIREMENTS } from '../../shared/constants';
+import { getProductIcon } from '../../shared/utils/iconHelpers';
 
 interface IntegrationWindowProps {
   product: IntegrationProduct;

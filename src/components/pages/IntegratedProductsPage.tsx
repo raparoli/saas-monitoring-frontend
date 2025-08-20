@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useApi } from '../../hooks/useApi';
-import { apiService } from '../../services/api';
+import { useApi } from '../../shared/hooks/useApi';
+import { apiService } from '../../shared/services/api';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
