@@ -90,7 +90,9 @@ export function useAuth(): UseAuthReturn {
 
   // Check auth on mount
   useEffect(() => {
-    checkAuth();
+    if (checkAuth) {
+      checkAuth();
+    }
   }, [checkAuth]);
 
   // Set up token refresh interval

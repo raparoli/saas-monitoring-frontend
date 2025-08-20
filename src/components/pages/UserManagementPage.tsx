@@ -36,8 +36,8 @@ export function UserManagementPage() {
   const filteredUsers = useMemo(() => {
     return (users || []).filter(user => {
       const matchesSearch = 
-        user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase());
+        (user.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (user.email || '').toLowerCase().includes(searchTerm.toLowerCase());
       
       const matchesRole = roleFilter === 'All' || user.role === roleFilter;
       const matchesStatus = statusFilter === 'All' || user.status === statusFilter;

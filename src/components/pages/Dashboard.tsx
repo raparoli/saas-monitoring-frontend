@@ -108,12 +108,11 @@ export function Dashboard({ onAcronisDetail }: DashboardProps) {
   ];
 
   // Alert Summary Data
-  const alertStats = dashboardData?.alertStats.map(stat => ({
+  const alertStats = (dashboardData?.alertStats || []).map(stat => ({
     ...stat,
     icon: stat.title.includes('Critical') ? AlertCircle :
           stat.title.includes('Warning') ? AlertTriangle :
           stat.title.includes('Error') ? AlertTriangle : Info
-  })) || [];
 
   // Alerts by Product Data
   const alertsByProductData = [

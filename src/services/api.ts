@@ -67,10 +67,10 @@ class ApiService {
     
     let filteredUsers = [...mockUsers];
     
-    if (params?.search) {
+    if (params?.search && params.search.trim()) {
       filteredUsers = filteredUsers.filter(user => 
-        user.name.toLowerCase().includes(params.search!.toLowerCase()) ||
-        user.email.toLowerCase().includes(params.search!.toLowerCase())
+        (user.name || '').toLowerCase().includes(params.search!.toLowerCase()) ||
+        (user.email || '').toLowerCase().includes(params.search!.toLowerCase())
       );
     }
     
@@ -152,12 +152,12 @@ class ApiService {
     
     let filteredAlerts = [...mockAlertEmailLogs];
     
-    if (params?.search) {
+    if (params?.search && params.search.trim()) {
       filteredAlerts = filteredAlerts.filter(alert => 
-        alert.customerName.toLowerCase().includes(params.search!.toLowerCase()) ||
-        alert.resourceName.toLowerCase().includes(params.search!.toLowerCase()) ||
-        alert.alertId.toLowerCase().includes(params.search!.toLowerCase()) ||
-        alert.productName.toLowerCase().includes(params.search!.toLowerCase())
+        (alert.customerName || '').toLowerCase().includes(params.search!.toLowerCase()) ||
+        (alert.resourceName || '').toLowerCase().includes(params.search!.toLowerCase()) ||
+        (alert.alertId || '').toLowerCase().includes(params.search!.toLowerCase()) ||
+        (alert.productName || '').toLowerCase().includes(params.search!.toLowerCase())
       );
     }
     
@@ -209,11 +209,11 @@ class ApiService {
     
     let filteredProducts = [...mockProducts];
     
-    if (params?.search) {
+    if (params?.search && params.search.trim()) {
       filteredProducts = filteredProducts.filter(product => 
-        product.name.toLowerCase().includes(params.search!.toLowerCase()) ||
-        product.description.toLowerCase().includes(params.search!.toLowerCase()) ||
-        product.category.toLowerCase().includes(params.search!.toLowerCase())
+        (product.name || '').toLowerCase().includes(params.search!.toLowerCase()) ||
+        (product.description || '').toLowerCase().includes(params.search!.toLowerCase()) ||
+        (product.category || '').toLowerCase().includes(params.search!.toLowerCase())
       );
     }
     

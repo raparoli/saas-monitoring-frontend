@@ -59,12 +59,12 @@ export function AlertManagementPage() {
 
   // Filtered data
   const filteredAlerts = useMemo(() => {
-    return alerts.filter(alert => {
+    return (alerts || []).filter(alert => {
       const matchesSearch = 
-        alert.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        alert.resourceName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        alert.alertId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        alert.productName.toLowerCase().includes(searchTerm.toLowerCase());
+        (alert.customerName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (alert.resourceName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (alert.alertId || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (alert.productName || '').toLowerCase().includes(searchTerm.toLowerCase());
       
       const matchesSeverity = severityFilter === 'all' || alert.severity === severityFilter;
       const matchesCategory = categoryFilter === 'all' || alert.category === categoryFilter;
@@ -84,12 +84,13 @@ export function AlertManagementPage() {
 
   // Summary statistics
   const summaryStats = useMemo(() => {
-    const totalEmailed = alerts.length;
-    const failedEmails = alerts.filter(a => a.emailStatus === 'Failed').length;
-    const criticalSent = alerts.filter(a => a.severity === 'Critical' && a.emailStatus === 'Sent').length;
+    const alertsArray = alerts || [];
+    const totalEmailed = alertsArray.length;
+    const failedEmails = alertsArray.filter(a => a.emailStatus === 'Failed').length;
+    const criticalSent = alertsArray.filter(a => a.severity === 'Critical' && a.emailStatus === 'Sent').length;
     
     // Most common alert type
-    const alertTypeCounts = alerts.reduce((acc, alert) => {
+    const alertTypeCounts = alertsArray.reduce((acc, alert) => {
       acc[alert.alertType] = (acc[alert.alertType] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
@@ -97,7 +98,7 @@ export function AlertManagementPage() {
       .sort(([,a], [,b]) => b - a)[0]?.[0] || 'N/A';
 
     // Most affected category
-    const categoryCounts = alerts.reduce((acc, alert) => {
+    const categoryCounts = alertsArray.reduce((acc, alert) => {
       acc[alert.category] = (acc[alert.category] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);

@@ -26,10 +26,12 @@ export const formatDateTime = (dateString: string): string => {
 };
 
 export const getInitials = (name: string): string => {
-  return name.split(' ').map(n => n[0]).join('').toUpperCase();
+  if (!name) return 'U';
+  return name.split(' ').map(n => n?.[0] || '').join('').toUpperCase() || 'U';
 };
 
 export const getDaysUntilRenewal = (renewalDate: string): number => {
+  if (!renewalDate) return 0;
   const renewal = new Date(renewalDate);
   const today = new Date();
   const diffTime = renewal.getTime() - today.getTime();
@@ -37,6 +39,7 @@ export const getDaysUntilRenewal = (renewalDate: string): number => {
 };
 
 export const getUsagePercentage = (used: number, total: number): number => {
+  if (!total || total === 0) return 0;
   return Math.round((used / total) * 100);
 };
 

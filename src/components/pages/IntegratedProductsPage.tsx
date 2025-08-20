@@ -88,11 +88,11 @@ export function IntegratedProductsPage({ onViewDetails, onAcronisDetail, onStart
     }
   };
 
-  const filteredProducts = actualIntegratedProducts.filter(product =>
+  const filteredProducts = (actualIntegratedProducts || []).filter(product =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const availableProducts = availableProductsData.filter(p => p.status === 'Available');
+  const availableProducts = (availableProductsData || []).filter(p => p.status === 'Available');
 
   const getStatusBadge = (status: string) => {
     switch (status) {

@@ -63,16 +63,16 @@ export function ProductsPage({ onStartIntegration }: ProductsPageProps) {
   };
 
   const filteredProducts = products.filter(product => {
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.category.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = (product.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (product.description || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (product.category || '').toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
-  const availableProducts = products.filter(p => p.status === 'Available');
-  const integratedProducts = products.filter(p => p.status === 'Integrated');
-  const recommendedProducts = products.filter(p => p.isRecommended && p.status === 'Available');
+  const availableProducts = (products || []).filter(p => p.status === 'Available');
+  const integratedProducts = (products || []).filter(p => p.status === 'Integrated');
+  const recommendedProducts = (products || []).filter(p => p.isRecommended && p.status === 'Available');
 
   return (
     <div className="flex-1 p-6 space-y-8 bg-gradient-to-br from-slate-50 via-white to-purple-50 min-h-screen">
