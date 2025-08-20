@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { Button } from './ui/button';
-import { Badge } from './ui/badge';
-import { Input } from './ui/input';
-import { Progress } from './ui/progress';
-import { Separator } from './ui/separator';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { Button } from '../ui/button';
+import { Badge } from '../ui/badge';
+import { Input } from '../ui/input';
+import { Progress } from '../ui/progress';
+import { Separator } from '../ui/separator';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 import { 
   Eye, 
   Calendar, 
@@ -25,85 +25,27 @@ import {
   HardDrive,
   AlertTriangle
 } from 'lucide-react';
-
-interface ProductDetail {
-  id: string;
-  name: string;
-  logo: string;
-  status: string;
-  totalLicenses: number;
-  usedLicenses: number;
-  licenseType: string;
-  renewalDate: string;
-}
-
-interface IntegrationProduct {
-  id: string;
-  name: string;
-  description: string;
-  category: string;
-  provider?: string;
-  rating?: number;
-  users?: string;
-  pricing?: string;
-  features?: string[];
-  isPopular?: boolean;
-  isRecommended?: boolean;
-  integrationComplexity?: 'Simple' | 'Moderate' | 'Advanced';
-  status?: 'Available' | 'Coming Soon' | 'Beta' | 'Integrated';
-}
+import { ProductDetail, IntegrationProduct } from '../../types';
+import { AVAILABLE_PRODUCTS } from '../../constants';
+import { 
+  getProductIcon, 
+  getCategoryIcon 
+} from '../../lib/icons';
+import { 
+  formatDate, 
+  getDaysUntilRenewal, 
+  getUsagePercentage,
+  getStatusBadgeVariant,
+  getUsageBadgeVariant,
+  getComplexityColor,
+  getProductGradient
+} from '../../utils';
 
 interface IntegratedProductsPageProps {
   onViewDetails: (page: 'product-detail', product: ProductDetail) => void;
   onAcronisDetail: () => void;
   onStartIntegration: (product: IntegrationProduct) => void;
 }
-
-const AVAILABLE_PRODUCTS: IntegrationProduct[] = [
-  {
-    id: 'bitdefender',
-    name: 'Bitdefender GravityZone',
-    description: 'Advanced endpoint protection with machine learning-based threat detection and response capabilities.',
-    category: 'Security',
-    provider: 'Bitdefender',
-    rating: 4.8,
-    users: '10K+',
-    pricing: 'From $29.99/month',
-    features: ['Endpoint Protection', 'Threat Intelligence', 'Advanced Analytics', 'Compliance Reporting'],
-    isPopular: true,
-    isRecommended: true,
-    integrationComplexity: 'Simple',
-    status: 'Available'
-  },
-  {
-    id: 'microsoft',
-    name: 'Microsoft 365',
-    description: 'Complete productivity suite with Office applications, cloud storage, and collaboration tools for enterprise.',
-    category: 'Productivity',
-    provider: 'Microsoft',
-    rating: 4.6,
-    users: '50K+',
-    pricing: 'From $12.50/month',
-    features: ['Office Suite', 'OneDrive Storage', 'Teams Collaboration', 'Exchange Email'],
-    isPopular: true,
-    integrationComplexity: 'Simple',
-    status: 'Available'
-  },
-  {
-    id: 'zoho',
-    name: 'Zoho Workplace',
-    description: 'Integrated business suite offering email, document management, and collaboration tools for organizations.',
-    category: 'Productivity',
-    provider: 'Zoho Corporation',
-    rating: 4.4,
-    users: '25K+',
-    pricing: 'From $3/month per user',
-    features: ['Email & Calendar', 'Document Management', 'Team Chat', 'Video Conferencing'],
-    isRecommended: true,
-    integrationComplexity: 'Moderate',
-    status: 'Available'
-  }
-];
 
 export function IntegratedProductsPage({ onViewDetails, onAcronisDetail, onStartIntegration }: IntegratedProductsPageProps) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -121,90 +63,19 @@ export function IntegratedProductsPage({ onViewDetails, onAcronisDetail, onStart
     }
   ];
 
-  const getProductIcon = (productName: string) => {
-    if (productName.includes('Acronis')) return HardDrive;
-    if (productName.includes('Microsoft')) return Cloud;
-    if (productName.includes('Bitdefender')) return Shield;
-    return Shield;
-  };
-
-  const getCategoryIcon = (category: string) => {
-    switch (category) {
-      case 'Security': return Shield;
-      case 'Productivity': return FileText;
-      case 'Backup': return HardDrive;
-      default: return Cloud;
+  const handleViewDetails = (product: ProductDetail) => {
+    if (product.id === 'acronis') {
+      onAcronisDetail();
+    } else {
+      onViewDetails('product-detail', product);
     }
   };
 
-  const getProductGradient = (productId: string): string => {
-    switch (productId) {
-      case 'acronis':
-        return 'bg-gradient-to-br from-orange-50 to-red-100 border-orange-200';
-      case 'microsoft':
-        return 'bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200';
-      case 'bitdefender':
-        return 'bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200';
-      case 'zoho':
-        return 'bg-gradient-to-br from-green-50 to-green-100 border-green-200';
-      default:
-        return 'bg-gradient-to-br from-gray-50 to-gray-100 border-gray-200';
-    }
-  };
+  const filteredProducts = integratedProducts.filter(product =>
+    product.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  };
-
-  const getDaysUntilRenewal = (renewalDate: string) => {
-    const renewal = new Date(renewalDate);
-    const today = new Date();
-    const diffTime = renewal.getTime() - today.getTime();
-    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  };
-
-  const getUsagePercentage = (used: number, total: number) => {
-    return Math.round((used / total) * 100);
-  };
-
-  const getStatusBadgeVariant = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'active':
-      case 'enabled':
-      case 'connected':
-      case 'sent':
-        return 'default';
-      case 'warning':
-      case 'pending':
-        return 'secondary';
-      case 'inactive':
-      case 'disabled':
-      case 'failed':
-      case 'suspended':
-        return 'destructive';
-      default:
-        return 'secondary';
-    }
-  };
-
-  const getUsageBadgeVariant = (percentage: number) => {
-    if (percentage >= 90) return 'destructive';
-    if (percentage >= 75) return 'secondary';
-    return 'default';
-  };
-
-  const getComplexityColor = (complexity: string) => {
-    switch (complexity) {
-      case 'Simple': return 'bg-green-100 text-green-800';
-      case 'Moderate': return 'bg-yellow-100 text-yellow-800';
-      case 'Advanced': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
+  const availableProducts = AVAILABLE_PRODUCTS.filter(p => p.status === 'Available');
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -220,20 +91,6 @@ export function IntegratedProductsPage({ onViewDetails, onAcronisDetail, onStart
         return <Badge variant="secondary">{status}</Badge>;
     }
   };
-
-  const handleViewDetails = (product: ProductDetail) => {
-    if (product.id === 'acronis') {
-      onAcronisDetail();
-    } else {
-      onViewDetails('product-detail', product);
-    }
-  };
-
-  const filteredProducts = integratedProducts.filter(product =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const availableProducts = AVAILABLE_PRODUCTS.filter(p => p.status === 'Available');
 
   return (
     <TooltipProvider>

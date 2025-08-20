@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { Button } from './ui/button';
-import { Badge } from './ui/badge';
-import { Input } from './ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { Separator } from './ui/separator';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { Button } from '../ui/button';
+import { Badge } from '../ui/badge';
+import { Input } from '../ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { Separator } from '../ui/separator';
 import { 
   Plus, 
   Star, 
@@ -18,102 +18,17 @@ import {
   FileText,
   Cloud
 } from 'lucide-react';
-
-interface IntegrationProduct {
-  id: string;
-  name: string;
-  description: string;
-  category: string;
-  provider?: string;
-  rating?: number;
-  users?: string;
-  pricing?: string;
-  features?: string[];
-  isPopular?: boolean;
-  isRecommended?: boolean;
-  integrationComplexity?: 'Simple' | 'Moderate' | 'Advanced';
-  status?: 'Available' | 'Coming Soon' | 'Beta' | 'Integrated';
-}
+import { IntegrationProduct } from '../../types';
+import { AVAILABLE_PRODUCTS, PRODUCT_CATEGORIES } from '../../constants';
+import { getCategoryIcon } from '../../lib/icons';
 
 interface ProductsPageProps {
   onStartIntegration: (product: IntegrationProduct) => void;
 }
 
-const AVAILABLE_PRODUCTS: IntegrationProduct[] = [
-  {
-    id: 'acronis',
-    name: 'Acronis Cyber Protect',
-    description: 'Comprehensive backup and cybersecurity solution combining data protection with anti-malware capabilities.',
-    category: 'Security',
-    provider: 'Acronis',
-    rating: 4.7,
-    users: '15K+',
-    pricing: 'From $69/month',
-    features: ['Backup & Recovery', 'Anti-malware Protection', 'Vulnerability Assessment', 'Patch Management'],
-    isPopular: true,
-    isRecommended: true,
-    integrationComplexity: 'Simple',
-    status: 'Integrated'
-  },
-  {
-    id: 'bitdefender',
-    name: 'Bitdefender GravityZone',
-    description: 'Advanced endpoint protection with machine learning-based threat detection and response capabilities.',
-    category: 'Security',
-    provider: 'Bitdefender',
-    rating: 4.8,
-    users: '10K+',
-    pricing: 'From $29.99/month',
-    features: ['Endpoint Protection', 'Threat Intelligence', 'Advanced Analytics', 'Compliance Reporting'],
-    isPopular: true,
-    isRecommended: true,
-    integrationComplexity: 'Simple',
-    status: 'Available'
-  },
-  {
-    id: 'microsoft',
-    name: 'Microsoft 365',
-    description: 'Complete productivity suite with Office applications, cloud storage, and collaboration tools for enterprise.',
-    category: 'Productivity',
-    provider: 'Microsoft',
-    rating: 4.6,
-    users: '50K+',
-    pricing: 'From $12.50/month',
-    features: ['Office Suite', 'OneDrive Storage', 'Teams Collaboration', 'Exchange Email'],
-    isPopular: true,
-    integrationComplexity: 'Simple',
-    status: 'Available'
-  },
-  {
-    id: 'zoho',
-    name: 'Zoho Workplace',
-    description: 'Integrated business suite offering email, document management, and collaboration tools for organizations.',
-    category: 'Productivity',
-    provider: 'Zoho Corporation',
-    rating: 4.4,
-    users: '25K+',
-    pricing: 'From $3/month per user',
-    features: ['Email & Calendar', 'Document Management', 'Team Chat', 'Video Conferencing'],
-    isRecommended: true,
-    integrationComplexity: 'Moderate',
-    status: 'Available'
-  }
-];
-
-const PRODUCT_CATEGORIES = ['all', 'Security', 'Productivity'] as const;
-
 export function ProductsPage({ onStartIntegration }: ProductsPageProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-
-  const getCategoryIcon = (category: string) => {
-    switch (category) {
-      case 'Security': return Shield;
-      case 'Productivity': return FileText;
-      case 'Backup': return Database;
-      default: return Cloud;
-    }
-  };
 
   const getComplexityBadgeColor = (complexity: string) => {
     switch (complexity) {
