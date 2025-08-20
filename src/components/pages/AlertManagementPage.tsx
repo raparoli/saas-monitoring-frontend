@@ -54,13 +54,14 @@ export function AlertManagementPage() {
     { immediate: true }
   );
 
-  const alerts = alertsData || [];
+  // Ensure safe array
+  const alerts = Array.isArray(alertsData) ? alertsData : [];
   const itemsPerPage = 10;
 
   // Filtered data
   const filteredAlerts = useMemo(() => {
-    return (alerts || []).filter(alert => {
-      if (!alert) return false;
+    return alerts.filter(alert => {
+      if (!alert || typeof alert !== 'object') return false;
       const matchesSearch = 
         (alert.customerName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
         (alert.resourceName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -85,14 +86,14 @@ export function AlertManagementPage() {
 
   // Summary statistics
   const summaryStats = useMemo(() => {
-    const alertsArray = alerts || [];
+    const alertsArray = alerts;
     const totalEmailed = alertsArray.length;
-    const failedEmails = alertsArray.filter(a => (a?.emailStatus || '') === 'Failed').length;
-    const criticalSent = alertsArray.filter(a => (a?.severity || '') === 'Critical' && (a?.emailStatus || '') === 'Sent').length;
+    const failedEmails = alertsArray.filter(a => a && typeof a === 'object' && (a.emailStatus || '') === 'Failed').length;
+    const criticalSent = alertsArray.filter(a => a && typeof a === 'object' && (a.severity || '') === 'Critical' && (a.emailStatus || '') === 'Sent').length;
     
     // Most common alert type
     const alertTypeCounts = alertsArray.reduce((acc, alert) => {
-      if (alert?.alertType) {
+      if (alert && typeof alert === 'object' && alert.alertType) {
         acc[alert.alertType] = (acc[alert.alertType] || 0) + 1;
       }
       return acc;
@@ -102,7 +103,7 @@ export function AlertManagementPage() {
 
     // Most affected category
     const categoryCounts = alertsArray.reduce((acc, alert) => {
-      if (alert?.category) {
+      if (alert && typeof alert === 'object' && alert.category) {
         acc[alert.category] = (acc[alert.category] || 0) + 1;
       }
       return acc;
@@ -382,7 +383,7 @@ export function AlertManagementPage() {
               </TableHeader>
               <TableBody>
                 {paginatedAlerts.map((alert) => {
-                  if (!alert) return null;
+                  if (!alert || typeof alert !== 'object') return null;
                   const StatusIcon = getStatusIcon(alert.emailStatus);
                   return (
                     <TableRow 
@@ -485,7 +486,7 @@ export function AlertManagementPage() {
             </DialogDescription>
           </DialogHeader>
           
-          {selectedAlert && (
+          {selectedAlert && typeof selectedAlert === 'object' && (
             <ScrollArea className="max-h-[60vh] pr-6">
               <div className="space-y-6">
                 {/* Alert Overview */}

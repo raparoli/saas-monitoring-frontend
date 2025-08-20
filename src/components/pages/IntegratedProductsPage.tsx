@@ -65,6 +65,10 @@ export function IntegratedProductsPage({ onViewDetails, onAcronisDetail, onStart
     { immediate: true }
   );
 
+  // Ensure we have safe arrays
+  const safeIntegratedProducts = Array.isArray(integratedProducts) ? integratedProducts : [];
+  const safeAvailableProductsData = Array.isArray(availableProductsData) ? availableProductsData : [];
+
   const mockIntegratedProducts: ProductDetail[] = [
     {
       id: 'acronis',
@@ -78,10 +82,10 @@ export function IntegratedProductsPage({ onViewDetails, onAcronisDetail, onStart
     }
   ];
 
-  const actualIntegratedProducts = integratedProducts.length > 0 ? integratedProducts : mockIntegratedProducts;
+  const actualIntegratedProducts = safeIntegratedProducts.length > 0 ? safeIntegratedProducts : mockIntegratedProducts;
 
   const handleViewDetails = (product: ProductDetail) => {
-    if ((product?.id || '') === 'acronis') {
+    if (product && (product.id || '') === 'acronis') {
       onAcronisDetail();
     } else {
       onViewDetails('product-detail', product);
@@ -89,11 +93,11 @@ export function IntegratedProductsPage({ onViewDetails, onAcronisDetail, onStart
   };
 
   const filteredProducts = (actualIntegratedProducts || []).filter(product => {
-    if (!product) return false;
+    if (!product || typeof product !== 'object') return false;
     return (product.name || '').toLowerCase().includes((searchTerm || '').toLowerCase());
   });
 
-  const availableProducts = (availableProductsData || []).filter(p => (p?.status || '') === 'Available');
+  const availableProducts = safeAvailableProductsData.filter(p => p && typeof p === 'object' && (p.status || '') === 'Available');
 
   const getStatusBadge = (status: string) => {
     switch (status || '') {
@@ -198,7 +202,7 @@ export function IntegratedProductsPage({ onViewDetails, onAcronisDetail, onStart
 
           <div className="grid gap-6 lg:grid-cols-2">
             {filteredProducts.map((product) => {
-              if (!product) return null;
+              if (!product || typeof product !== 'object') return null;
               const usagePercentage = getUsagePercentage(product.usedLicenses, product.totalLicenses);
               const daysUntilRenewal = getDaysUntilRenewal(product.renewalDate);
               const IconComponent = getProductIcon(product.name);
@@ -332,7 +336,7 @@ export function IntegratedProductsPage({ onViewDetails, onAcronisDetail, onStart
           </div>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {availableProducts.map((product) => {
-              if (!product) return null;
+              if (!product || typeof product !== 'object') return null;
               const IconComponent = getCategoryIcon(product.category);
               return (
                 <Card key={product.id} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 group relative overflow-hidden">
@@ -390,7 +394,7 @@ export function IntegratedProductsPage({ onViewDetails, onAcronisDetail, onStart
                     </div>
                     
                     <Button 
-                      className="w-full shadow-sm hover:shadow-md group-hover:bg-primary/90" 
+                      className="w-full shadow-sm hover:shadow-md group-hover:bg-primary/90"
                       onClick={() => onStartIntegration(product)}
                       disabled={(product.status || '') !== 'Available'}
                     >

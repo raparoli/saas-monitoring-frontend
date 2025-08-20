@@ -52,11 +52,14 @@ export function Dashboard({ onAcronisDetail }: DashboardProps) {
     { immediate: true }
   );
 
+  // Ensure safe data access
+  const safeDashboardData = dashboardData && typeof dashboardData === 'object' ? dashboardData : null;
+
   // Global Summary Data
-  const globalStats = dashboardData ? [
+  const globalStats = safeDashboardData ? [
     {
       title: 'Total SaaS Products Integrated',
-      value: (dashboardData.totalProducts || 0).toString(),
+      value: (safeDashboardData.totalProducts || 0).toString(),
       change: '+1 this month',
       trend: 'up',
       icon: Target,
@@ -64,7 +67,7 @@ export function Dashboard({ onAcronisDetail }: DashboardProps) {
     },
     {
       title: 'Total Customers Across All Products',
-      value: `${dashboardData.totalCustomers || 0}+`,
+      value: `${safeDashboardData.totalCustomers || 0}+`,
       change: '+12 this week',
       trend: 'up',
       icon: Users,
@@ -72,7 +75,7 @@ export function Dashboard({ onAcronisDetail }: DashboardProps) {
     },
     {
       title: 'Protected Workloads (Combined)',
-      value: (dashboardData.protectedWorkloads || 0).toString(),
+      value: (safeDashboardData.protectedWorkloads || 0).toString(),
       change: '+23 this month',
       trend: 'up',
       icon: Shield,
@@ -80,7 +83,7 @@ export function Dashboard({ onAcronisDetail }: DashboardProps) {
     },
     {
       title: 'Overall License Utilization Rate',
-      value: `${dashboardData.licenseUtilization || 0}%`,
+      value: `${safeDashboardData.licenseUtilization || 0}%`,
       change: '+2.4% this month',
       trend: 'up',
       icon: Activity,
@@ -89,10 +92,10 @@ export function Dashboard({ onAcronisDetail }: DashboardProps) {
   ] : [];
 
   // Storage Distribution Data
-  const storageData = dashboardData?.storageDistribution || [];
+  const storageData = Array.isArray(safeDashboardData?.storageDistribution) ? safeDashboardData.storageDistribution : [];
 
   // License Utilization by Product Data
-  const licenseUtilizationData = dashboardData?.licenseUtilizationData || [];
+  const licenseUtilizationData = Array.isArray(safeDashboardData?.licenseUtilizationData) ? safeDashboardData.licenseUtilizationData : [];
 
   // Integrated Products Data
   const integratedProducts = [
@@ -108,7 +111,7 @@ export function Dashboard({ onAcronisDetail }: DashboardProps) {
   ];
 
   // Alert Summary Data
-  const alertStats = (dashboardData?.alertStats || []).map(stat => ({
+  const alertStats = (Array.isArray(safeDashboardData?.alertStats) ? safeDashboardData.alertStats : []).map(stat => ({
     ...stat,
     icon: stat.title.includes('Critical') ? AlertCircle :
           stat.title.includes('Warning') ? AlertTriangle :
@@ -154,7 +157,7 @@ export function Dashboard({ onAcronisDetail }: DashboardProps) {
   const renderTooltip = (props: any) => {
     if (props.active && props.payload && props.payload.length) {
       const data = props.payload[0].payload;
-      if (!data) return null;
+      if (!data || typeof data !== 'object') return null;
       return (
         <div className="bg-white p-3 border rounded-lg shadow-lg">
           <p className="font-medium">{data.product || 'Unknown'}</p>
@@ -214,6 +217,7 @@ export function Dashboard({ onAcronisDetail }: DashboardProps) {
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {globalStats.map((stat) => {
               const Icon = stat.icon;
+              if (!stat || typeof stat !== 'object') return null;
               return (
                 <Card key={stat.title} className="relative overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300 group">
                   <div className={`absolute inset-0 bg-gradient-to-br ${stat.color} opacity-5 group-hover:opacity-10 transition-opacity duration-300`} />
@@ -349,6 +353,7 @@ export function Dashboard({ onAcronisDetail }: DashboardProps) {
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {integratedProducts.map((product) => {
                   const Icon = product.icon;
+                  if (!product || typeof product !== 'object') return null;
                   return (
                     <Card key={product.name} className="border shadow-sm hover:shadow-md transition-shadow">
                       <CardContent className="p-6">
@@ -404,6 +409,7 @@ export function Dashboard({ onAcronisDetail }: DashboardProps) {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               {alertStats.map((alert) => {
                 const Icon = alert.icon;
+                if (!alert || typeof alert !== 'object') return null;
                 return (
                   <Card key={alert.title} className="border-0 shadow-md">
                     <CardContent className="p-4">
@@ -466,6 +472,7 @@ export function Dashboard({ onAcronisDetail }: DashboardProps) {
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {aiInsights.map((insight, index) => {
                   const Icon = insight.icon;
+                  if (!insight || typeof insight !== 'object') return null;
                   const priorityColor = insight.priority === 'critical' ? 'border-red-200 bg-red-50' :
                                        insight.priority === 'high' ? 'border-orange-200 bg-orange-50' :
                                        'border-blue-200 bg-blue-50';

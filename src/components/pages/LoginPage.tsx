@@ -19,22 +19,18 @@ export function LoginPage({ onLogin }: LoginPageProps) {
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const [loginError, setLoginError] = useState<string>('');
 
-  const loginMutation = useMutation((credentials: { email: string; password: string }) =>
-    apiService.login(credentials.email, credentials.password)
-  );
-
   const validateForm = () => {
     const newErrors: { email?: string; password?: string } = {};
     
-    if (!email) {
+    if (!email || typeof email !== 'string' || email.trim() === '') {
       newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
+    } else if (!/\S+@\S+\.\S+/.test(email.trim())) {
       newErrors.email = 'Please enter a valid email address';
     }
     
-    if (!password) {
+    if (!password || typeof password !== 'string') {
       newErrors.password = 'Password is required';
-    } else if (password.length < 6) {
+    } else if (password.trim().length < 6) {
       newErrors.password = 'Password must be at least 6 characters';
     }
     
@@ -49,9 +45,9 @@ export function LoginPage({ onLogin }: LoginPageProps) {
     if (validateForm()) {
       setIsLoading(true);
       try {
-        await onLogin(email, password);
+        await onLogin(email.trim(), password);
       } catch (error) {
-        setLoginError(error instanceof Error ? error.message : 'Login failed');
+        setLoginError(error instanceof Error && error.message ? error.message : 'Login failed');
       } finally {
         setIsLoading(false);
       }
@@ -84,7 +80,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
                   id="email"
                   type="email"
                   placeholder="Enter your email"
-                  value={email}
+                  value={email || ''}
                   onChange={(e) => setEmail(e.target.value)}
                   className={errors.email ? 'border-destructive' : ''}
                 />
@@ -100,7 +96,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
                     id="password"
                     type={showPassword ? 'text' : 'password'}
                     placeholder="Enter your password"
-                    value={password}
+                    value={password || ''}
                     onChange={(e) => setPassword(e.target.value)}
                     className={errors.password ? 'border-destructive' : ''}
                   />
@@ -123,15 +119,9 @@ export function LoginPage({ onLogin }: LoginPageProps) {
                 )}
               </div>
 
-              <Button type="submit" className="w-full" disabled={loginMutation.loading}>
-                {loginMutation.loading ? 'Signing In...' : 'Sign In'}
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? 'Signing In...' : 'Sign In'}
               </Button>
-              
-              {loginMutation.error && (
-                <div className="text-sm text-destructive text-center">
-                  {loginMutation.error}
-                </div>
-              )}
               
               {loginError && (
                 <div className="text-sm text-destructive text-center">

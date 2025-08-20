@@ -32,10 +32,13 @@ export function UserManagementPage() {
     { immediate: true }
   );
 
+  // Ensure safe array
+  const safeUsers = Array.isArray(users) ? users : [];
+
   // Filtered users
   const filteredUsers = useMemo(() => {
-    return (users || []).filter(user => {
-      if (!user) return false;
+    return safeUsers.filter(user => {
+      if (!user || typeof user !== 'object') return false;
       const matchesSearch = 
         (user.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
         (user.email || '').toLowerCase().includes(searchTerm.toLowerCase());
@@ -45,7 +48,7 @@ export function UserManagementPage() {
 
       return matchesSearch && matchesRole && matchesStatus;
     });
-  }, [users, searchTerm, roleFilter, statusFilter]);
+  }, [safeUsers, searchTerm, roleFilter, statusFilter]);
 
   const handleResetFilters = () => {
     setSearchTerm('');
@@ -177,6 +180,7 @@ export function UserManagementPage() {
             </TableHeader>
             <TableBody>
               {filteredUsers.map((u) => (
+                !u || typeof u !== 'object' ? null :
                 <TableRow key={u.id}>
                   <TableCell>
                     <div className="flex items-center gap-2">

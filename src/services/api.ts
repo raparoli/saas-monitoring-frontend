@@ -67,19 +67,20 @@ class ApiService {
     
     let filteredUsers = [...mockUsers];
     
-    if (params?.search && params.search.trim()) {
+    if (params?.search && typeof params.search === 'string' && params.search.trim()) {
       filteredUsers = filteredUsers.filter(user => 
+        user && typeof user === 'object' &&
         (user.name || '').toLowerCase().includes(params.search!.toLowerCase()) ||
         (user.email || '').toLowerCase().includes(params.search!.toLowerCase())
       );
     }
     
-    if (params?.role && params.role !== 'All') {
-      filteredUsers = filteredUsers.filter(user => user.role === params.role);
+    if (params?.role && typeof params.role === 'string' && params.role !== 'All') {
+      filteredUsers = filteredUsers.filter(user => user && typeof user === 'object' && user.role === params.role);
     }
     
-    if (params?.status && params.status !== 'All') {
-      filteredUsers = filteredUsers.filter(user => user.status === params.status);
+    if (params?.status && typeof params.status === 'string' && params.status !== 'All') {
+      filteredUsers = filteredUsers.filter(user => user && typeof user === 'object' && user.status === params.status);
     }
     
     return {
@@ -92,7 +93,7 @@ class ApiService {
   async createUser(userData: Partial<User>): Promise<ApiResponse<User>> {
     await delay(1000);
     
-    const newUser: User = {
+    const newUser: User = userData && typeof userData === 'object' ? {
       id: Date.now().toString(),
       name: userData.name || '',
       email: userData.email || '',
@@ -101,7 +102,7 @@ class ApiService {
       lastActive: new Date().toISOString(),
       createdOn: new Date().toISOString(),
       assignedProducts: userData.assignedProducts || []
-    };
+    } : {} as User;
     
     return {
       success: true,
@@ -113,12 +114,12 @@ class ApiService {
   async updateUser(id: string, userData: Partial<User>): Promise<ApiResponse<User>> {
     await delay(800);
     
-    const existingUser = mockUsers.find(u => u.id === id);
+    const existingUser = mockUsers.find(u => u && typeof u === 'object' && u.id === id);
     if (!existingUser) {
       throw new Error('User not found');
     }
     
-    const updatedUser = { ...existingUser, ...userData };
+    const updatedUser = userData && typeof userData === 'object' ? { ...existingUser, ...userData } : existingUser;
     
     return {
       success: true,
@@ -152,8 +153,9 @@ class ApiService {
     
     let filteredAlerts = [...mockAlertEmailLogs];
     
-    if (params?.search && params.search.trim()) {
+    if (params?.search && typeof params.search === 'string' && params.search.trim()) {
       filteredAlerts = filteredAlerts.filter(alert => 
+        alert && typeof alert === 'object' &&
         (alert.customerName || '').toLowerCase().includes(params.search!.toLowerCase()) ||
         (alert.resourceName || '').toLowerCase().includes(params.search!.toLowerCase()) ||
         (alert.alertId || '').toLowerCase().includes(params.search!.toLowerCase()) ||
@@ -161,20 +163,20 @@ class ApiService {
       );
     }
     
-    if (params?.severity && params.severity !== 'all') {
-      filteredAlerts = filteredAlerts.filter(alert => alert.severity === params.severity);
+    if (params?.severity && typeof params.severity === 'string' && params.severity !== 'all') {
+      filteredAlerts = filteredAlerts.filter(alert => alert && typeof alert === 'object' && alert.severity === params.severity);
     }
     
-    if (params?.category && params.category !== 'all') {
-      filteredAlerts = filteredAlerts.filter(alert => alert.category === params.category);
+    if (params?.category && typeof params.category === 'string' && params.category !== 'all') {
+      filteredAlerts = filteredAlerts.filter(alert => alert && typeof alert === 'object' && alert.category === params.category);
     }
     
-    if (params?.emailStatus && params.emailStatus !== 'all') {
-      filteredAlerts = filteredAlerts.filter(alert => alert.emailStatus === params.emailStatus);
+    if (params?.emailStatus && typeof params.emailStatus === 'string' && params.emailStatus !== 'all') {
+      filteredAlerts = filteredAlerts.filter(alert => alert && typeof alert === 'object' && alert.emailStatus === params.emailStatus);
     }
     
-    if (params?.product && params.product !== 'all') {
-      filteredAlerts = filteredAlerts.filter(alert => alert.productName === params.product);
+    if (params?.product && typeof params.product === 'string' && params.product !== 'all') {
+      filteredAlerts = filteredAlerts.filter(alert => alert && typeof alert === 'object' && alert.productName === params.product);
     }
     
     // Pagination
@@ -209,16 +211,17 @@ class ApiService {
     
     let filteredProducts = [...mockProducts];
     
-    if (params?.search && params.search.trim()) {
+    if (params?.search && typeof params.search === 'string' && params.search.trim()) {
       filteredProducts = filteredProducts.filter(product => 
+        product && typeof product === 'object' &&
         (product.name || '').toLowerCase().includes(params.search!.toLowerCase()) ||
         (product.description || '').toLowerCase().includes(params.search!.toLowerCase()) ||
         (product.category || '').toLowerCase().includes(params.search!.toLowerCase())
       );
     }
     
-    if (params?.category && params.category !== 'all') {
-      filteredProducts = filteredProducts.filter(product => product.category === params.category);
+    if (params?.category && typeof params.category === 'string' && params.category !== 'all') {
+      filteredProducts = filteredProducts.filter(product => product && typeof product === 'object' && product.category === params.category);
     }
     
     return {

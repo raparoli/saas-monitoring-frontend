@@ -67,16 +67,17 @@ export function ProductsPage({ onStartIntegration }: ProductsPageProps) {
   };
 
   const filteredProducts = safeProducts.filter(product => {
-    const matchesSearch = (product.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (product.description || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (product.category || '').toLowerCase().includes(searchTerm.toLowerCase());
+    if (!product || typeof product !== 'object') return false;
+    const matchesSearch = (product.name || '').toLowerCase().includes((searchTerm || '').toLowerCase()) ||
+                         (product.description || '').toLowerCase().includes((searchTerm || '').toLowerCase()) ||
+                         (product.category || '').toLowerCase().includes((searchTerm || '').toLowerCase());
     const matchesCategory = selectedCategory === 'all' || (product.category || '') === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
-  const availableProducts = safeProducts.filter(p => (p.status || '') === 'Available');
-  const integratedProducts = safeProducts.filter(p => (p.status || '') === 'Integrated');
-  const recommendedProducts = safeProducts.filter(p => p.isRecommended && (p.status || '') === 'Available');
+  const availableProducts = safeProducts.filter(p => p && typeof p === 'object' && (p.status || '') === 'Available');
+  const integratedProducts = safeProducts.filter(p => p && typeof p === 'object' && (p.status || '') === 'Integrated');
+  const recommendedProducts = safeProducts.filter(p => p && typeof p === 'object' && p.isRecommended && (p.status || '') === 'Available');
 
   return (
     <div className="flex-1 p-6 space-y-8 bg-gradient-to-br from-slate-50 via-white to-purple-50 min-h-screen">
@@ -242,6 +243,7 @@ export function ProductsPage({ onStartIntegration }: ProductsPageProps) {
             </div>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {integratedProducts.map((product) => {
+                if (!product || typeof product !== 'object') return null;
                 const IconComponent = getCategoryIcon(product.category);
                 return (
                   <Card key={product.id} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 group relative overflow-hidden">
@@ -313,6 +315,7 @@ export function ProductsPage({ onStartIntegration }: ProductsPageProps) {
             </div>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {availableProducts.map((product) => {
+                if (!product || typeof product !== 'object') return null;
                 const IconComponent = getCategoryIcon(product.category);
                 return (
                   <Card key={product.id} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 group relative overflow-hidden">
@@ -398,6 +401,7 @@ export function ProductsPage({ onStartIntegration }: ProductsPageProps) {
           
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {filteredProducts.map((product) => {
+              if (!product || typeof product !== 'object') return null;
               const IconComponent = getCategoryIcon(product.category);
               return (
                 <Card key={product.id} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 group relative overflow-hidden">

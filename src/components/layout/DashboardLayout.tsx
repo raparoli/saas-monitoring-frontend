@@ -13,6 +13,7 @@ import {
 import { Page } from '../../types';
 import { NAVIGATION_ITEMS, QUICK_ACTIONS } from '../../constants';
 import { AuthUser } from '../../services/auth';
+import { getInitials } from '../../utils';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
