@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useApi } from '../../../shared/hooks/useApi';
-import { apiService } from '../../../shared/services/api';
+import { productsService } from '../services/productsService';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../shared/components/ui/card';
 import { Button } from '../../../shared/components/ui/button';
 import { Badge } from '../../../shared/components/ui/badge';
@@ -55,13 +55,13 @@ export function IntegratedProductsPage({ onViewDetails, onAcronisDetail, onStart
   
   // API integration for integrated products
   const { data: integratedProducts = [], loading: integratedLoading, error: integratedError, refetch: refetchIntegrated } = useApi(
-    apiService.getIntegratedProducts,
+    productsService.getIntegratedProducts,
     { immediate: true }
   );
 
   // API integration for available products
   const { data: availableProductsData = [], loading: availableLoading, error: availableError, refetch: refetchAvailable } = useApi(
-    apiService.getAvailableProducts,
+    productsService.getAvailableProducts,
     { immediate: true }
   );
 
