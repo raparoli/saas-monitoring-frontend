@@ -1,4 +1,9 @@
 import React, { useState, useMemo } from 'react';
+import { MOCK_USERS, AVAILABLE_PRODUCTS } from '../src/data/mockUserData';
+import { User } from '../src/types';
+import { getRoleBadgeColor } from '../src/utils/badge-variants';
+import { getInitials, formatDate, formatDateTime } from '../src/utils/formatters';
+import { SearchAndFilter } from '../src/components/common/SearchAndFilter';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
@@ -18,33 +23,10 @@ import { toast } from 'sonner';
 import {
   Users,
   UserPlus,
-  Search,
-  Filter,
   Eye,
   Edit,
   Trash2,
-  ChevronLeft,
-  ChevronRight,
-  Mail,
-  Shield,
-  Calendar,
-  Clock,
-  Save,
-  Key,
-  AlertTriangle
 } from 'lucide-react';
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: 'Admin' | 'Analyst' | 'Viewer';
-  status: 'Active' | 'Suspended';
-  lastActive: string;
-  createdOn: string;
-  assignedProducts: string[];
-  avatar?: string;
-}
 
 interface InviteUserForm {
   email: string;
@@ -53,64 +35,8 @@ interface InviteUserForm {
 }
 
 export function UserManagementPage() {
-  // Mock user data
-  const mockUsers: User[] = [
-    {
-      id: '1',
-      name: 'John Doe',
-      email: 'john.doe@company.com',
-      role: 'Admin',
-      status: 'Active',
-      lastActive: '2024-01-15T14:30:00Z',
-      createdOn: '2023-06-15T09:00:00Z',
-      assignedProducts: ['Acronis', 'Microsoft', 'Bitdefender']
-    },
-    {
-      id: '2',
-      name: 'Sarah Wilson',
-      email: 'sarah.wilson@company.com',
-      role: 'Analyst',
-      status: 'Active',
-      lastActive: '2024-01-15T12:45:00Z',
-      createdOn: '2023-08-22T10:30:00Z',
-      assignedProducts: ['Acronis', 'Microsoft']
-    },
-    {
-      id: '3',
-      name: 'Michael Chen',
-      email: 'michael.chen@company.com',
-      role: 'Viewer',
-      status: 'Active',
-      lastActive: '2024-01-14T16:20:00Z',
-      createdOn: '2023-11-10T14:15:00Z',
-      assignedProducts: ['Acronis']
-    },
-    {
-      id: '4',
-      name: 'Emily Rodriguez',
-      email: 'emily.rodriguez@company.com',
-      role: 'Analyst',
-      status: 'Suspended',
-      lastActive: '2024-01-10T11:30:00Z',
-      createdOn: '2023-09-05T13:45:00Z',
-      assignedProducts: ['Microsoft', 'Bitdefender']
-    },
-    {
-      id: '5',
-      name: 'David Thompson',
-      email: 'david.thompson@company.com',
-      role: 'Viewer',
-      status: 'Active',
-      lastActive: '2024-01-15T08:15:00Z',
-      createdOn: '2023-12-01T16:00:00Z',
-      assignedProducts: ['Bitdefender']
-    }
-  ];
-
-  const availableProducts = ['Acronis', 'Microsoft', 'Bitdefender'];
-
   // State management
-  const [users, setUsers] = useState<User[]>(mockUsers);
+  const [users, setUsers] = useState<User[]>(MOCK_USERS);
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('All');
   const [statusFilter, setStatusFilter] = useState('All');
@@ -145,38 +71,6 @@ export function UserManagementPage() {
       return matchesSearch && matchesRole && matchesStatus;
     });
   }, [users, searchTerm, roleFilter, statusFilter]);
-
-  // Pagination
-  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
-  const paginatedUsers = filteredUsers.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-
-  const getRoleColor = (role: string) => {
-    switch (role) {
-      case 'Admin': return 'bg-red-100 text-red-800';
-      case 'Analyst': return 'bg-blue-100 text-blue-800';
-      case 'Viewer': return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'Active': return 'bg-green-100 text-green-800';
-      case 'Suspended': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString();
-  };
-
-  const formatDateTime = (dateString: string) => {
-    return new Date(dateString).toLocaleString();
-  };
 
   const handleInviteUser = () => {
     if (!inviteForm.email) {
@@ -249,10 +143,6 @@ export function UserManagementPage() {
     toast.success('Password reset email sent');
   };
 
-  const getInitials = (name: string) => {
-    return name.split(' ').map(n => n[0]).join('').toUpperCase();
-  };
-
   return (
     <div className="flex-1 p-8 bg-white min-h-screen">
       {/* Header */}
@@ -273,48 +163,34 @@ export function UserManagementPage() {
       </div>
 
       {/* Filters */}
-      <Card className="border bg-gray-50">
-        <CardHeader>
-          <CardTitle className="text-base font-medium flex items-center gap-2">
-            <Filter className="w-4 h-4" />
-            Filters
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-3 md:grid-cols-4">
-            <div className="relative md:col-span-2">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <Input
-                placeholder="Search by name or email..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9 bg-white border-gray-200"
-              />
-            </div>
-            <Select value={roleFilter} onValueChange={setRoleFilter}>
-              <SelectTrigger className="bg-white border-gray-200">
-                <SelectValue placeholder="Role" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="All">All Roles</SelectItem>
-                <SelectItem value="Admin">Admin</SelectItem>
-                <SelectItem value="Analyst">Analyst</SelectItem>
-                <SelectItem value="Viewer">Viewer</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="bg-white border-gray-200">
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="All">All Status</SelectItem>
-                <SelectItem value="Active">Active</SelectItem>
-                <SelectItem value="Suspended">Suspended</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </CardContent>
-      </Card>
+      <SearchAndFilter
+        searchValue={searchTerm}
+        onSearchChange={setSearchTerm}
+        searchPlaceholder="Search by name or email..."
+        filters={[
+          {
+            value: roleFilter,
+            onChange: setRoleFilter,
+            placeholder: "Role",
+            options: [
+              { value: 'All', label: 'All Roles' },
+              { value: 'Admin', label: 'Admin' },
+              { value: 'Analyst', label: 'Analyst' },
+              { value: 'Viewer', label: 'Viewer' }
+            ]
+          },
+          {
+            value: statusFilter,
+            onChange: setStatusFilter,
+            placeholder: "Status",
+            options: [
+              { value: 'All', label: 'All Status' },
+              { value: 'Active', label: 'Active' },
+              { value: 'Suspended', label: 'Suspended' }
+            ]
+          }
+        ]}
+      />
 
       {/* Users Table */}
       <Card className="mt-6 border bg-white">
@@ -352,7 +228,7 @@ export function UserManagementPage() {
                     {u.email}
                   </TableCell>
                   <TableCell>
-                    <Badge variant="outline" className="bg-gray-100">
+                    <Badge variant="outline" className={getRoleBadgeColor(u.role)}>
                       {u.role}
                     </Badge>
                   </TableCell>
@@ -387,4 +263,3 @@ export function UserManagementPage() {
     </div>
   );
 }
-//////////////////////////////////////////////

@@ -1,26 +1,17 @@
 import React from 'react';
+import { NAVIGATION_ITEMS, QUICK_ACTIONS } from '../src/constants/navigation';
+import { Page } from '../src/types';
 import { Button } from './ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Badge } from './ui/badge';
 import { Separator } from './ui/separator';
 import { 
-  LayoutDashboard, 
-  Package, 
-  Plug, 
   LogOut, 
   Bell,
   Search,
-  User,
   ChevronDown,
   Sparkles,
-  Activity,
-  Shield,
-  Zap,
-  Mail,
-  Users
 } from 'lucide-react';
-
-type Page = 'login' | 'dashboard' | 'products' | 'integrated-products' | 'product-detail' | 'acronis-detail' | 'alert-management' | 'user-management';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -30,70 +21,6 @@ interface DashboardLayoutProps {
 }
 
 export function DashboardLayout({ children, currentPage, onNavigate, onLogout }: DashboardLayoutProps) {
-  const navigationItems = [
-    {
-      id: 'dashboard' as Page,
-      label: 'Dashboard',
-      icon: LayoutDashboard,
-     // description: 'Overview & Analytics',
-      badge: null,
-      gradient: 'from-blue-500 to-blue-600'
-    },
-    {
-      id: 'products' as Page,
-      label: 'Product Marketplace',
-      icon: Package,
-     // description: 'Discover Products',
-      badge: 'New',
-      gradient: 'from-purple-500 to-purple-600'
-    },
-    {
-      id: 'integrated-products' as Page,
-      label: 'Integrated Products',
-      icon: Plug,
-    //  description: 'Manage Integrations',
-      badge: '1',
-      gradient: 'from-green-500 to-green-600'
-    },
-    {
-      id: 'alert-management' as Page,
-      label: 'Alert Management',
-      icon: Mail,
-     // description: 'Email Alert Tracking',
-      badge: '10.8K',
-      gradient: 'from-orange-500 to-orange-600'
-    },
-    {
-      id: 'user-management' as Page,
-      label: 'User Management',
-      icon: Users,
-    //  description: 'Manage User Accounts',
-      badge: '5',
-      gradient: 'from-indigo-500 to-indigo-600'
-    }
-  ];
-
-  const quickActions = [
-    {
-      label: 'System Health',
-      icon: Activity,
-      status: 'Healthy',
-      color: 'text-green-500'
-    },
-    {
-      label: 'Security Score',
-      icon: Shield,
-      status: '95%',
-      color: 'text-blue-500'
-    },
-    {
-      label: 'Performance',
-      icon: Zap,
-      status: 'Optimal',
-      color: 'text-yellow-500'
-    }
-  ];
-
   return (
     <div className="flex h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
       {/* Enhanced Sidebar */}
@@ -114,7 +41,7 @@ export function DashboardLayout({ children, currentPage, onNavigate, onLogout }:
         {/* Navigation */}
         <div className="flex-1 px-4 py-6 space-y-2">
           <div className="space-y-1">
-            {navigationItems.map((item) => {
+            {NAVIGATION_ITEMS.map((item) => {
               const Icon = item.icon;
               const isActive = currentPage === item.id;
               
@@ -153,7 +80,6 @@ export function DashboardLayout({ children, currentPage, onNavigate, onLogout }:
                           </Badge>
                         )}
                       </div>
-                      {/* <p className="text-xs text-gray-500 mt-0.5">{item.description}</p> */}
                     </div>
                   </div>
                 </Button>
@@ -166,12 +92,12 @@ export function DashboardLayout({ children, currentPage, onNavigate, onLogout }:
           {/* Quick Status */}
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
-              <Activity className="w-4 h-4 text-gray-500" />
+              <QUICK_ACTIONS[0].icon className="w-4 h-4 text-gray-500" />
               <span className="text-sm font-medium text-gray-700">System Status</span>
             </div>
             
             <div className="space-y-3">
-              {quickActions.map((action, index) => {
+              {QUICK_ACTIONS.map((action, index) => {
                 const Icon = action.icon;
                 return (
                   <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200">
@@ -187,7 +113,6 @@ export function DashboardLayout({ children, currentPage, onNavigate, onLogout }:
               })}
             </div>
           </div>
-
 
         </div>
 
@@ -268,5 +193,3 @@ export function DashboardLayout({ children, currentPage, onNavigate, onLogout }:
     </div>
   );
 }
-
-export type { Page };

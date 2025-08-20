@@ -1,4 +1,12 @@
 import React, { useState } from 'react';
+import { AVAILABLE_PRODUCTS } from '../src/constants/products';
+import { ProductDetail, IntegrationProduct, Page } from '../src/types';
+import { getProductIcon, getCategoryIcon } from '../src/utils/icons';
+import { getStatusBadgeVariant, getUsageBadgeVariant, getComplexityBadgeColor } from '../src/utils/badge-variants';
+import { getProductGradient } from '../src/utils/product-gradients';
+import { formatDate, getDaysUntilRenewal, getUsagePercentage } from '../src/utils/formatters';
+import { PageHeader } from '../src/components/common/PageHeader';
+import { SearchAndFilter } from '../src/components/common/SearchAndFilter';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
@@ -8,60 +16,22 @@ import { Progress } from './ui/progress';
 import { Separator } from './ui/separator';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 import { 
-  Search, 
   Eye, 
   Calendar, 
-  Users, 
-  Shield, 
   Cloud, 
-  HardDrive, 
-  TrendingUp,
   AlertTriangle,
   CheckCircle,
-  Activity,
-  BarChart3,
   Star,
   Clock,
   Zap,
-  Filter,
-  RefreshCw,
-  FileText,
   Award,
   ArrowRight
 } from 'lucide-react';
-
-interface ProductDetail {
-  id: string;
-  name: string;
-  logo: string;
-  status: string;
-  totalLicenses: number;
-  usedLicenses: number;
-  licenseType: string;
-  renewalDate: string;
-}
-
-interface IntegrationProduct {
-  id: string;
-  name: string;
-  description: string;
-  category: string;
-  provider?: string;
-  rating?: number;
-  users?: string;
-  pricing?: string;
-  features?: string[];
-  isPopular?: boolean;
-  isRecommended?: boolean;
-  integrationComplexity?: 'Simple' | 'Moderate' | 'Advanced';
-  status?: 'Available' | 'Coming Soon' | 'Beta' | 'Integrated';
-}
 
 interface IntegratedProductsPageProps {
   onViewDetails: (page: 'product-detail', product: ProductDetail) => void;
   onAcronisDetail: () => void;
   onStartIntegration: (product: IntegrationProduct) => void;
-
 }
 
 export function IntegratedProductsPage({ onViewDetails, onAcronisDetail, onStartIntegration }: IntegratedProductsPageProps) {
@@ -81,94 +51,6 @@ export function IntegratedProductsPage({ onViewDetails, onAcronisDetail, onStart
   ];
 
 
-    const products: IntegrationProduct[] = [
-      {
-        id: 'acronis',
-        name: 'Acronis Cyber Protect',
-        description: 'Comprehensive backup and cybersecurity solution combining data protection with anti-malware capabilities.',
-        category: 'Security',
-        provider: 'Acronis',
-        rating: 4.7,
-        users: '15K+',
-        pricing: 'From $69/month',
-        features: ['Backup & Recovery', 'Anti-malware Protection', 'Vulnerability Assessment', 'Patch Management'],
-        isPopular: true,
-        isRecommended: true,
-        integrationComplexity: 'Simple',
-        status: 'Integrated'
-      },
-      {
-        id: 'bitdefender',
-        name: 'Bitdefender GravityZone',
-        description: 'Advanced endpoint protection with machine learning-based threat detection and response capabilities.',
-        category: 'Security',
-        provider: 'Bitdefender',
-        rating: 4.8,
-        users: '10K+',
-        pricing: 'From $29.99/month',
-        features: ['Endpoint Protection', 'Threat Intelligence', 'Advanced Analytics', 'Compliance Reporting'],
-        isPopular: true,
-        isRecommended: true,
-        integrationComplexity: 'Simple',
-        status: 'Available'
-      },
-      {
-        id: 'microsoft',
-        name: 'Microsoft 365',
-        description: 'Complete productivity suite with Office applications, cloud storage, and collaboration tools for enterprise.',
-        category: 'Productivity',
-        provider: 'Microsoft',
-        rating: 4.6,
-        users: '50K+',
-        pricing: 'From $12.50/month',
-        features: ['Office Suite', 'OneDrive Storage', 'Teams Collaboration', 'Exchange Email'],
-        isPopular: true,
-        integrationComplexity: 'Simple',
-        status: 'Available'
-      },
-      {
-        id: 'zoho',
-        name: 'Zoho Workplace',
-        description: 'Integrated business suite offering email, document management, and collaboration tools for organizations.',
-        category: 'Productivity',
-        provider: 'Zoho Corporation',
-        rating: 4.4,
-        users: '25K+',
-        pricing: 'From $3/month per user',
-        features: ['Email & Calendar', 'Document Management', 'Team Chat', 'Video Conferencing'],
-        isRecommended: true,
-        integrationComplexity: 'Moderate',
-        status: 'Available'
-      }
-    ];
-  
-    const categories = ['all', 'Security', 'Productivity'];
-  
-    // const filteredProducts = products.filter(product => {
-    //   const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    //                        product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    //                        product.category.toLowerCase().includes(searchTerm.toLowerCase());
-    //   const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
-    //   return matchesSearch && matchesCategory;
-    // });
-  
-    const getCategoryIcon = (category: string) => {
-      switch (category) {
-        case 'Security': return Shield;
-        case 'Productivity': return FileText;
-        default: return Cloud;
-      }
-    };
-  
-    const getComplexityColor = (complexity: string) => {
-      switch (complexity) {
-        case 'Simple': return 'bg-green-100 text-green-800';
-        case 'Moderate': return 'bg-yellow-100 text-yellow-800';
-        case 'Advanced': return 'bg-red-100 text-red-800';
-        default: return 'bg-gray-100 text-gray-800';
-      }
-    };
-  
     const getStatusBadge = (status: string) => {
       switch (status) {
         case 'Available':
@@ -184,59 +66,6 @@ export function IntegratedProductsPage({ onViewDetails, onAcronisDetail, onStart
       }
     };
 
-  const getStatusBadgeVariant = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'active':
-        return 'default';
-      case 'warning':
-        return 'destructive';
-      case 'inactive':
-        return 'secondary';
-      default:
-        return 'secondary';
-    }
-  };
-
-  const getUsagePercentage = (used: number, total: number) => {
-    return Math.round((used / total) * 100);
-  };
-
-  const getUsageBadgeVariant = (percentage: number) => {
-    if (percentage >= 90) return 'destructive';
-    if (percentage >= 75) return 'secondary';
-    return 'default';
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  };
-
-  const getDaysUntilRenewal = (dateString: string) => {
-    const renewalDate = new Date(dateString);
-    const today = new Date();
-    const diffTime = renewalDate.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
-  };
-
-  const getProductIcon = (productName: string) => {
-    if (productName.includes('Acronis')) return HardDrive;
-    return Shield;
-  };
-
-  const getProductGradient = (productId: string) => {
-    switch (productId) {
-      case 'acronis':
-        return 'bg-gradient-to-br from-orange-50 to-red-100 border-orange-200';
-      default:
-        return 'bg-gradient-to-br from-gray-50 to-gray-100 border-gray-200';
-    }
-  };
-
   const handleViewDetails = (product: ProductDetail) => {
     if (product.id === 'acronis') {
       onAcronisDetail();
@@ -249,60 +78,24 @@ export function IntegratedProductsPage({ onViewDetails, onAcronisDetail, onStart
     product.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Calculate summary statistics
-  const totalProducts = integratedProducts.length;
-  const totalLicenses = integratedProducts.reduce((sum, product) => sum + product.totalLicenses, 0);
-  const usedLicenses = integratedProducts.reduce((sum, product) => sum + product.usedLicenses, 0);
-  const overallUsagePercentage = Math.round((usedLicenses / totalLicenses) * 100);
-  const nextRenewalDays = Math.min(...integratedProducts.map(p => getDaysUntilRenewal(p.renewalDate)));
-  const activeProducts = integratedProducts.filter(p => p.status === 'Active').length;
-    const availableProducts = products.filter(p => p.status === 'Available');
-//  const integratedProducts = products.filter(p => p.status === 'Integrated');
-  const popularProducts = products.filter(p => p.isPopular && p.status === 'Available');
-  const recommendedProducts = products.filter(p => p.isRecommended && p.status === 'Available');
-
+  const availableProducts = AVAILABLE_PRODUCTS.filter(p => p.status === 'Available');
 
   return (
     <TooltipProvider>
       <div className="flex-1 p-6 space-y-8">
         {/* Enhanced Header Section */}
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-6 lg:space-y-0">
-          <div className="space-y-2">
-            <div className="flex items-center space-x-2">
-              <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl shadow-lg">
-                <Cloud className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                {/* <h1 className="text-3xl font-semibold tracking-tight">Integrated Products</h1> */}
-              <h1 className="text-3xl font-semibold tracking-tight">Products</h1>
-
-                <p className="text-muted-foreground">
-                  Manage and monitor your connected SaaS products with comprehensive insights
-                </p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="flex items-center space-x-3">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search products..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 w-64 bg-white shadow-sm"
-              />
-            </div>
-            <Button variant="outline" size="sm" className="shadow-sm">
-              <Filter className="w-4 h-4 mr-2" />
-              Filters
-            </Button>
-            <Button variant="outline" size="sm" className="shadow-sm">
-              <RefreshCw className="w-4 h-4 mr-2" />
-              Refresh
-            </Button>
-          </div>
-        </div>
+        <PageHeader
+          icon={Cloud}
+          title="Products"
+          description="Manage and monitor your connected SaaS products with comprehensive insights"
+          iconGradient="from-blue-500 to-purple-600"
+        >
+          <SearchAndFilter
+            searchValue={searchTerm}
+            onSearchChange={setSearchTerm}
+            searchPlaceholder="Search products..."
+          />
+        </PageHeader>
 
         {/* Enhanced Summary Cards with better visual hierarchy */}
         {/* <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">

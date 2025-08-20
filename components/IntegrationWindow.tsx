@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import { INTEGRATION_REQUIREMENTS } from '../src/constants/products';
+import { IntegrationProduct } from '../src/types';
+import { getProductIcon } from '../src/utils/icons';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/dialog';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -18,19 +21,11 @@ import {
   Loader2,
   Key,
   Settings,
-  Users,
   Shield,
   Cloud,
   HardDrive,
   Info
 } from 'lucide-react';
-
-interface IntegrationProduct {
-  id: string;
-  name: string;
-  description: string;
-  category: string;
-}
 
 interface IntegrationWindowProps {
   product: IntegrationProduct;
@@ -71,48 +66,6 @@ export function IntegrationWindow({ product, onClose, onComplete }: IntegrationW
 
   const getCurrentStepIndex = () => steps.findIndex(step => step.id === currentStep);
   const progress = ((getCurrentStepIndex() + 1) / steps.length) * 100;
-
-  const getProductIcon = () => {
-    switch (product.id) {
-      case 'microsoft':
-        return Cloud;
-      case 'bitdefender':
-        return Shield;
-      case 'acronis':
-        return HardDrive;
-      default:
-        return Settings;
-    }
-  };
-
-  const getProductRequirements = () => {
-    switch (product.id) {
-      case 'microsoft':
-        return {
-          credentials: ['Application ID', 'Client Secret', 'Tenant ID'],
-          permissions: ['User.Read.All', 'Organization.Read.All', 'Directory.Read.All'],
-          requirements: ['Admin consent required', 'Azure AD application registration']
-        };
-      case 'bitdefender':
-        return {
-          credentials: ['API Key', 'Company ID'],
-          permissions: ['Read company information', 'Manage licenses', 'View usage reports'],
-          requirements: ['GravityZone account', 'API access enabled']
-        };
-      case 'acronis':
-        return {
-          credentials: ['API Key', 'Server URL', 'Username'],
-          permissions: ['Read backup status', 'Manage users', 'View reports'],
-          requirements: ['Acronis Cyber Cloud account', 'Partner portal access']
-        };
-      default:
-        return {
-          credentials: ['API Key'],
-          permissions: ['Basic access'],
-          requirements: ['Active account']
-        };
-    }
-  };
 
   const handleNext = async () => {
     const stepIndex = getCurrentStepIndex();
@@ -156,8 +109,12 @@ export function IntegrationWindow({ product, onClose, onComplete }: IntegrationW
     }));
   };
 
-  const Icon = getProductIcon();
-  const requirements = getProductRequirements();
+  const Icon = getProductIcon(product.name);
+  const requirements = INTEGRATION_REQUIREMENTS[product.id as keyof typeof INTEGRATION_REQUIREMENTS] || {
+    credentials: ['API Key'],
+    permissions: ['Basic access'],
+    requirements: ['Active account']
+  };
 
   const renderStepContent = () => {
     switch (currentStep) {

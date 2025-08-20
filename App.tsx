@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useAppState } from './src/hooks/useAppState';
 import { LoginPage } from './components/LoginPage';
 import { DashboardLayout } from './components/DashboardLayout';
 import { Dashboard } from './components/Dashboard';
@@ -9,90 +10,25 @@ import { AcronisDetailPage } from './components/AcronisDetailPage';
 import { IntegrationWindow } from './components/IntegrationWindow';
 import { AlertManagementPage } from './components/AlertManagementPage';
 import { UserManagementPage } from './components/UserManagementPage';
-
-type Page = 'login' | 'dashboard' | 'products' | 'integrated-products' | 'product-detail' | 'acronis-detail' | 'alert-management' | 'user-management';
-
-interface ProductDetail {
-  id: string;
-  name: string;
-  logo: string;
-  status: string;
-  totalLicenses: number;
-  usedLicenses: number;
-  licenseType: string;
-  renewalDate: string;
-}
-
-interface IntegrationProduct {
-  id: string;
-  name: string;
-  description: string;
-  category: string;
-}
+import { Page } from './src/types';
 
 export default function App() {
-  const [currentPage, setCurrentPage] = useState<Page>('login');
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<ProductDetail | null>(null);
-  const [integrationProduct, setIntegrationProduct] = useState<IntegrationProduct | null>(null);
-  const [showIntegrationWindow, setShowIntegrationWindow] = useState(false);
-  // Track the source page for proper back navigation
-  const [acronisSourcePage, setAcronisSourcePage] = useState<Page>('dashboard');
-
-  const handleLogin = () => {
-    setIsLoggedIn(true);
-    setCurrentPage('dashboard');
-  };
-
-  const handleNavigation = (page: Page, product?: ProductDetail) => {
-    if (page === 'product-detail' && product) {
-      setSelectedProduct(product);
-    }
-    setCurrentPage(page);
-  };
-
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-    setCurrentPage('login');
-    setSelectedProduct(null);
-    setIntegrationProduct(null);
-    setShowIntegrationWindow(false);
-    setAcronisSourcePage('dashboard');
-  };
-
-  const handleStartIntegration = (product: IntegrationProduct) => {
-    setIntegrationProduct(product);
-    setShowIntegrationWindow(true);
-  };
-
-  const handleCloseIntegration = () => {
-    setShowIntegrationWindow(false);
-    setIntegrationProduct(null);
-  };
-
-  const handleIntegrationComplete = () => {
-    setShowIntegrationWindow(false);
-    setIntegrationProduct(null);
-    // Optionally navigate to integrated products page
-    setCurrentPage('integrated-products');
-  };
-
-  // Function to navigate to Acronis detail page from dashboard
-  const handleAcronisDetailFromDashboard = () => {
-    setAcronisSourcePage('dashboard');
-    setCurrentPage('acronis-detail');
-  };
-
-  // Function to navigate to Acronis detail page from integrated products
-  const handleAcronisDetailFromIntegratedProducts = () => {
-    setAcronisSourcePage('integrated-products');
-    setCurrentPage('acronis-detail');
-  };
-
-  // Function to handle back navigation from Acronis detail page
-  const handleBackFromAcronis = () => {
-    setCurrentPage(acronisSourcePage);
-  };
+  const {
+    currentPage,
+    isLoggedIn,
+    selectedProduct,
+    integrationProduct,
+    showIntegrationWindow,
+    handleLogin,
+    handleNavigation,
+    handleLogout,
+    handleStartIntegration,
+    handleCloseIntegration,
+    handleIntegrationComplete,
+    handleAcronisDetailFromDashboard,
+    handleAcronisDetailFromIntegratedProducts,
+    handleBackFromAcronis
+  } = useAppState();
 
   if (!isLoggedIn) {
     return <LoginPage onLogin={handleLogin} />;
