@@ -1,23 +1,13 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { Button } from './ui/button';
-import { Badge } from './ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
-import { Progress } from './ui/progress';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { Button } from '../ui/button';
+import { Badge } from '../ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
+import { Progress } from '../ui/progress';
 import { ArrowLeft, Cloud, Shield, Calendar, Users, Activity, AlertTriangle } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-
-interface ProductDetail {
-  id: string;
-  name: string;
-  logo: string;
-  status: string;
-  totalLicenses: number;
-  usedLicenses: number;
-  licenseType: string;
-  renewalDate: string;
-}
+import { ProductDetail } from '../../types';
 
 interface ProductDetailPageProps {
   product: ProductDetail;
@@ -69,17 +59,6 @@ export function ProductDetailPage({ product, onBack }: ProductDetailPageProps) {
 
   const usagePercentage = Math.round((product.usedLicenses / product.totalLicenses) * 100);
   const availableLicenses = product.totalLicenses - product.usedLicenses;
-
-  const getSeverityBadgeVariant = (severity: string) => {
-    switch (severity) {
-      case 'warning':
-        return 'destructive';
-      case 'info':
-        return 'default';
-      default:
-        return 'secondary';
-    }
-  };
 
   return (
     <div className="flex-1 p-6 space-y-6">

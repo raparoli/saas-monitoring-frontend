@@ -1,11 +1,11 @@
 import React, { useState, useMemo } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { Button } from './ui/button';
-import { Badge } from './ui/badge';
-import { Input } from './ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { Button } from '../ui/button';
+import { Badge } from '../ui/badge';
+import { Input } from '../ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import {
   Users,
   Edit,
@@ -15,71 +15,9 @@ import {
   Filter,
   RefreshCw
 } from 'lucide-react';
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: 'Admin' | 'Analyst' | 'Viewer';
-  status: 'Active' | 'Suspended';
-  lastActive: string;
-  createdOn: string;
-  assignedProducts: string[];
-  avatar?: string;
-}
-
-const MOCK_USERS: User[] = [
-  {
-    id: '1',
-    name: 'John Doe',
-    email: 'john.doe@company.com',
-    role: 'Admin',
-    status: 'Active',
-    lastActive: '2024-01-15T14:30:00Z',
-    createdOn: '2023-06-15T09:00:00Z',
-    assignedProducts: ['Acronis', 'Microsoft', 'Bitdefender']
-  },
-  {
-    id: '2',
-    name: 'Sarah Wilson',
-    email: 'sarah.wilson@company.com',
-    role: 'Analyst',
-    status: 'Active',
-    lastActive: '2024-01-15T12:45:00Z',
-    createdOn: '2023-08-22T10:30:00Z',
-    assignedProducts: ['Acronis', 'Microsoft']
-  },
-  {
-    id: '3',
-    name: 'Michael Chen',
-    email: 'michael.chen@company.com',
-    role: 'Viewer',
-    status: 'Active',
-    lastActive: '2024-01-14T16:20:00Z',
-    createdOn: '2023-11-10T14:15:00Z',
-    assignedProducts: ['Acronis']
-  },
-  {
-    id: '4',
-    name: 'Emily Rodriguez',
-    email: 'emily.rodriguez@company.com',
-    role: 'Analyst',
-    status: 'Suspended',
-    lastActive: '2024-01-10T11:30:00Z',
-    createdOn: '2023-09-05T13:45:00Z',
-    assignedProducts: ['Microsoft', 'Bitdefender']
-  },
-  {
-    id: '5',
-    name: 'David Thompson',
-    email: 'david.thompson@company.com',
-    role: 'Viewer',
-    status: 'Active',
-    lastActive: '2024-01-15T08:15:00Z',
-    createdOn: '2023-12-01T16:00:00Z',
-    assignedProducts: ['Bitdefender']
-  }
-];
+import { User } from '../../types';
+import { MOCK_USERS } from '../../constants';
+import { getRoleBadgeColor, getInitials } from '../../utils';
 
 export function UserManagementPage() {
   // State management
@@ -87,19 +25,6 @@ export function UserManagementPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('All');
   const [statusFilter, setStatusFilter] = useState('All');
-
-  const getRoleBadgeColor = (role: string) => {
-    switch (role) {
-      case 'Admin': return 'bg-red-100 text-red-800';
-      case 'Analyst': return 'bg-blue-100 text-blue-800';
-      case 'Viewer': return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const getInitials = (name: string) => {
-    return name.split(' ').map(n => n[0]).join('').toUpperCase();
-  };
 
   // Filtered users
   const filteredUsers = useMemo(() => {

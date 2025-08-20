@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from './ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { TooltipProvider } from './ui/tooltip';
+import { Button } from '../ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+import { TooltipProvider } from '../ui/tooltip';
 import { CustomerUsageBreakdownPage } from './CustomerUsageBreakdownPage';
-import { EnhancedCustomerDrawer } from './acronis/EnhancedCustomerDrawer';
-import { CustomerDetailDrawer } from './acronis/CustomerDetailDrawer';
-import { AlertDetailDrawer } from './acronis/AlertDetailDrawer';
-import { OverviewTab } from './acronis/OverviewTab';
-import { CustomersTab } from './acronis/CustomersTab';
-import { UsageTab } from './acronis/UsageTab';
-import { AlertsTab } from './acronis/AlertsTab';
-import { LicenseSummaryTab } from './acronis/LicenseSummaryTab';
+import { EnhancedCustomerDrawer } from '../acronis/EnhancedCustomerDrawer';
+import { CustomerDetailDrawer } from '../acronis/CustomerDetailDrawer';
+import { AlertDetailDrawer } from '../acronis/AlertDetailDrawer';
+import { OverviewTab } from '../acronis/OverviewTab';
+import { CustomersTab } from '../acronis/CustomersTab';
+import { UsageTab } from '../acronis/UsageTab';
+import { AlertsTab } from '../acronis/AlertsTab';
+import { LicenseSummaryTab } from '../acronis/LicenseSummaryTab';
 import { 
   ArrowLeft, 
   HardDrive, 
@@ -25,8 +25,8 @@ import {
 } from 'lucide-react';
 
 // Import types and constants
-import { Customer, Alert, CustomerUsageDetail, SortField, SortDirection } from './acronis/types';
-import { alerts, customers, customerUsageDetails } from './acronis/constants';
+import { Customer, Alert, CustomerUsageDetail, SortField, SortDirection } from '../acronis/types';
+import { alerts, customers, customerUsageDetails } from '../acronis/constants';
 
 interface AcronisDetailPageProps {
   onBack: () => void;
