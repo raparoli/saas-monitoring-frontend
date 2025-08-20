@@ -25,10 +25,12 @@ import {
   Shield,
   FileText,
   HardDrive,
-  AlertTriangle
+  AlertTriangle,
+  RefreshCw
 } from 'lucide-react';
 import { ProductDetail, IntegrationProduct } from '../../types';
 import { AVAILABLE_PRODUCTS } from '../../constants';
+import { 
   getProductIcon, 
   getCategoryIcon 
 } from '../../lib/icons';
@@ -124,8 +126,6 @@ export function IntegratedProductsPage({ onViewDetails, onAcronisDetail, onStart
             </div>
           </div>
         </div>
-        )}
-        )}
 
         {/* Search */}
         <Card className="border-0 shadow-lg">
@@ -318,6 +318,7 @@ export function IntegratedProductsPage({ onViewDetails, onAcronisDetail, onStart
             })}
           </div>
         </div>
+        )}
 
         {/* Available Products */}
         {!availableLoading && !availableError && (
@@ -399,6 +400,7 @@ export function IntegratedProductsPage({ onViewDetails, onAcronisDetail, onStart
             })}
           </div>
         </div>
+        )}
 
         {/* Enhanced Quick Actions Section */}
         <Card className="bg-gradient-to-r from-slate-50 to-blue-50 border-slate-200">
