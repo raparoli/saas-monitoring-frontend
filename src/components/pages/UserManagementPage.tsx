@@ -38,7 +38,7 @@ export function UserManagementPage() {
   // Filtered users
   const filteredUsers = useMemo(() => {
     return safeUsers.filter(user => {
-      if (!user || typeof user !== 'object') return false;
+      if (!user || typeof user !== 'object' || user === null) return false;
       const matchesSearch = 
         (user.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
         (user.email || '').toLowerCase().includes(searchTerm.toLowerCase());
@@ -179,8 +179,8 @@ export function UserManagementPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredUsers.map((u) => (
-                !u || typeof u !== 'object' ? null :
+              {(filteredUsers || []).map((u) => (
+                !u || typeof u !== 'object' || u === null ? null :
                 <TableRow key={u.id}>
                   <TableCell>
                     <div className="flex items-center gap-2">
