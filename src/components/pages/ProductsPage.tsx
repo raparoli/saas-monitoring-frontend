@@ -38,6 +38,9 @@ export function ProductsPage({ onStartIntegration }: ProductsPageProps) {
     { immediate: true }
   );
 
+  // Ensure products is always an array
+  const safeProducts = Array.isArray(products) ? products : [];
+
   const getComplexityBadgeColor = (complexity: string) => {
     switch (complexity) {
       case 'Simple': return 'bg-green-100 text-green-800';
@@ -62,17 +65,17 @@ export function ProductsPage({ onStartIntegration }: ProductsPageProps) {
     }
   };
 
-  const filteredProducts = products.filter(product => {
+  const filteredProducts = safeProducts.filter(product => {
     const matchesSearch = (product.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (product.description || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (product.category || '').toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
+    const matchesCategory = selectedCategory === 'all' || (product.category || '') === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
-  const availableProducts = (products || []).filter(p => p.status === 'Available');
-  const integratedProducts = (products || []).filter(p => p.status === 'Integrated');
-  const recommendedProducts = (products || []).filter(p => p.isRecommended && p.status === 'Available');
+  const availableProducts = safeProducts.filter(p => (p.status || '') === 'Available');
+  const integratedProducts = safeProducts.filter(p => (p.status || '') === 'Integrated');
+  const recommendedProducts = safeProducts.filter(p => p.isRecommended && (p.status || '') === 'Available');
 
   return (
     <div className="flex-1 p-6 space-y-8 bg-gradient-to-br from-slate-50 via-white to-purple-50 min-h-screen">
@@ -174,7 +177,7 @@ export function ProductsPage({ onStartIntegration }: ProductsPageProps) {
                   placeholder="Search products, descriptions, or categories..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 bg-white shadow-sm"
+                  {(filteredProducts || []).length} product{(filteredProducts || []).length !== 1 ? 's' : ''}
                 />
               </div>
               
@@ -415,25 +418,25 @@ export function ProductsPage({ onStartIntegration }: ProductsPageProps) {
                     <div className="flex items-start space-x-4 mb-4">
                       <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-gray-500 to-gray-600 rounded-xl shadow-md group-hover:scale-110 transition-transform duration-300">
                         <IconComponent className="w-6 h-6 text-white" />
-                      </div>
-                      <div className="flex-1 min-w-0">
+                            <h3 className="font-semibold text-lg mb-1">{product.name || 'Unknown Product'}</h3>
+                            <p className="text-sm text-muted-foreground mb-2">{product.provider || 'Unknown Provider'}</p>
                         <h3 className="font-semibold text-lg mb-1">{product.name}</h3>
-                        <p className="text-sm text-muted-foreground mb-2">{product.provider}</p>
+                              {product.category || 'Uncategorized'}
                         <Badge variant="outline" className="text-xs">
                           {product.category}
                         </Badge>
                       </div>
-                    </div>
+                        <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{product.description || 'No description available'}</p>
                     
                     <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{product.description}</p>
-                    
+                {(filteredProducts || []).map((product) => {
                     <div className="space-y-3 mb-4">
                       {product.rating && (
                         <div className="flex items-center space-x-2">
-                          <div className="flex items-center space-x-1">
+                      {(product.status || '') === 'Integrated' && (
                             <Star className="w-4 h-4 text-yellow-500 fill-current" />
                             <span className="text-sm font-medium">{product.rating}</span>
-                          </div>
+                              <span className="text-sm text-muted-foreground">{product.users || '0'} users</span>
                           <Separator orientation="vertical" className="h-4" />
                           <span className="text-sm text-muted-foreground">{product.users} users</span>
                         </div>
@@ -448,14 +451,14 @@ export function ProductsPage({ onStartIntegration }: ProductsPageProps) {
                     </div>
                     
                     <Button 
-                      className="w-full shadow-sm hover:shadow-md group-hover:bg-primary/90" 
+                          disabled={(product.status || '') !== 'Available'}
                       onClick={() => onStartIntegration(product)}
-                      disabled={product.status !== 'Available'}
+                          {(product.status || '') === 'Integrated' ? (
                     >
                       {product.status === 'Integrated' ? (
                         <>
                           <CheckCircle className="w-4 h-4 mr-2" />
-                          Already Integrated
+                      {product.isPopular && (product.status || '') !== 'Integrated' && (
                         </>
                       ) : (
                         <>

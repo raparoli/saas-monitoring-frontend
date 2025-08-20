@@ -56,7 +56,7 @@ export function Dashboard({ onAcronisDetail }: DashboardProps) {
   const globalStats = dashboardData ? [
     {
       title: 'Total SaaS Products Integrated',
-      value: dashboardData.totalProducts.toString(),
+      value: (dashboardData.totalProducts || 0).toString(),
       change: '+1 this month',
       trend: 'up',
       icon: Target,
@@ -64,7 +64,7 @@ export function Dashboard({ onAcronisDetail }: DashboardProps) {
     },
     {
       title: 'Total Customers Across All Products',
-      value: `${dashboardData.totalCustomers}+`,
+      value: `${dashboardData.totalCustomers || 0}+`,
       change: '+12 this week',
       trend: 'up',
       icon: Users,
@@ -72,7 +72,7 @@ export function Dashboard({ onAcronisDetail }: DashboardProps) {
     },
     {
       title: 'Protected Workloads (Combined)',
-      value: dashboardData.protectedWorkloads.toString(),
+      value: (dashboardData.protectedWorkloads || 0).toString(),
       change: '+23 this month',
       trend: 'up',
       icon: Shield,
@@ -80,7 +80,7 @@ export function Dashboard({ onAcronisDetail }: DashboardProps) {
     },
     {
       title: 'Overall License Utilization Rate',
-      value: `${dashboardData.licenseUtilization}%`,
+      value: `${dashboardData.licenseUtilization || 0}%`,
       change: '+2.4% this month',
       trend: 'up',
       icon: Activity,
@@ -154,13 +154,14 @@ export function Dashboard({ onAcronisDetail }: DashboardProps) {
   const renderTooltip = (props: any) => {
     if (props.active && props.payload && props.payload.length) {
       const data = props.payload[0].payload;
+      if (!data) return null;
       return (
         <div className="bg-white p-3 border rounded-lg shadow-lg">
-          <p className="font-medium">{data.product}</p>
-          <p className="text-sm text-gray-600">Used: {data.used}</p>
-          <p className="text-sm text-gray-600">Available: {data.available}</p>
-          <p className="text-sm text-gray-600">Total: {data.total}</p>
-          <p className="text-sm font-medium">Utilization: {((data.used / data.total) * 100).toFixed(1)}%</p>
+          <p className="font-medium">{data.product || 'Unknown'}</p>
+          <p className="text-sm text-gray-600">Used: {data.used || 0}</p>
+          <p className="text-sm text-gray-600">Available: {data.available || 0}</p>
+          <p className="text-sm text-gray-600">Total: {data.total || 0}</p>
+          <p className="text-sm font-medium">Utilization: {data.total ? (((data.used || 0) / data.total) * 100).toFixed(1) : 0}%</p>
         </div>
       );
     }
@@ -219,10 +220,10 @@ export function Dashboard({ onAcronisDetail }: DashboardProps) {
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
                     <div className="space-y-1">
                       <CardTitle className="text-sm font-medium text-muted-foreground">
-                        {stat.title}
+                        {stat.title || 'Unknown Metric'}
                       </CardTitle>
                       <div className="flex items-center space-x-2">
-                        <span className="text-2xl font-bold">{stat.value}</span>
+                        <span className="text-2xl font-bold">{stat.value || '0'}</span>
                         {getTrendIcon(stat.trend)}
                       </div>
                     </div>
@@ -233,7 +234,7 @@ export function Dashboard({ onAcronisDetail }: DashboardProps) {
                   <CardContent className="pt-0">
                     <div className="space-y-1">
                       <Badge className="bg-green-100 text-green-800 text-xs">
-                        {stat.change}
+                        {stat.change || 'No change'}
                       </Badge>
                     </div>
                   </CardContent>
@@ -283,13 +284,13 @@ export function Dashboard({ onAcronisDetail }: DashboardProps) {
                         <div className="flex items-center space-x-3">
                           <div 
                             className="w-4 h-4 rounded-full"
-                            style={{ backgroundColor: item.color }}
+                            style={{ backgroundColor: item.color || '#gray' }}
                           />
-                          <span className="font-medium">{item.name}</span>
+                          <span className="font-medium">{item.name || 'Unknown'}</span>
                         </div>
                         <div className="text-right">
-                          <span className="text-lg font-bold">{item.value}%</span>
-                          <p className="text-xs text-muted-foreground">{(item.value * 10).toFixed(0)} TB</p>
+                          <span className="text-lg font-bold">{item.value || 0}%</span>
+                          <p className="text-xs text-muted-foreground">{((item.value || 0) * 10).toFixed(0)} TB</p>
                         </div>
                       </div>
                     ))}
@@ -357,9 +358,9 @@ export function Dashboard({ onAcronisDetail }: DashboardProps) {
                               <Icon className="w-5 h-5 text-white" />
                             </div>
                             <div>
-                              <h3 className="font-semibold">{product.name}</h3>
+                              <h3 className="font-semibold">{product.name || 'Unknown Product'}</h3>
                               <Badge className={product.statusColor}>
-                                {product.status}
+                                {product.status || 'Unknown'}
                               </Badge>
                             </div>
                           </div>
@@ -368,16 +369,16 @@ export function Dashboard({ onAcronisDetail }: DashboardProps) {
                         <div className="space-y-3">
                           <div className="flex justify-between text-sm">
                             <span>Total Users:</span>
-                            <span className="font-medium">{product.totalUsers}</span>
+                            <span className="font-medium">{product.totalUsers || 0}</span>
                           </div>
                           <div className="flex justify-between text-sm">
                             <span>License Usage:</span>
-                            <span className="font-medium">{product.licenseUsage}%</span>
+                            <span className="font-medium">{product.licenseUsage || 0}%</span>
                           </div>
-                          <Progress value={product.licenseUsage} className="h-2" />
+                          <Progress value={product.licenseUsage || 0} className="h-2" />
                           <div className="flex justify-between text-sm">
                             <span>Last Sync:</span>
-                            <span className="text-green-600">{product.lastSync}</span>
+                            <span className="text-green-600">{product.lastSync || 'Never'}</span>
                           </div>
                         </div>
                         
@@ -408,8 +409,8 @@ export function Dashboard({ onAcronisDetail }: DashboardProps) {
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-sm font-medium text-muted-foreground">{alert.title}</p>
-                          <p className="text-2xl font-bold">{alert.value}</p>
+                          <p className="text-sm font-medium text-muted-foreground">{alert.title || 'Unknown Alert'}</p>
+                          <p className="text-2xl font-bold">{alert.value || '0'}</p>
                         </div>
                         <div className={`flex items-center justify-center w-10 h-10 bg-gradient-to-br ${alert.color} rounded-xl`}>
                           <Icon className="w-5 h-5 text-white" />
@@ -480,10 +481,10 @@ export function Dashboard({ onAcronisDetail }: DashboardProps) {
                             <Icon className="w-4 h-4 text-white" />
                           </div>
                           <div className="flex-1">
-                            <h4 className="font-semibold mb-2">{insight.title}</h4>
-                            <p className="text-sm text-muted-foreground mb-4">{insight.text}</p>
+                            <h4 className="font-semibold mb-2">{insight.title || 'Unknown Insight'}</h4>
+                            <p className="text-sm text-muted-foreground mb-4">{insight.text || 'No details available'}</p>
                             <Button variant="outline" size="sm">
-                              {insight.actionLabel}
+                              {insight.actionLabel || 'View Details'}
                               <ChevronRight className="w-3 h-3 ml-1" />
                             </Button>
                           </div>

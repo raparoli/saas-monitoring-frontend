@@ -81,21 +81,22 @@ export function IntegratedProductsPage({ onViewDetails, onAcronisDetail, onStart
   const actualIntegratedProducts = integratedProducts.length > 0 ? integratedProducts : mockIntegratedProducts;
 
   const handleViewDetails = (product: ProductDetail) => {
-    if (product.id === 'acronis') {
+    if ((product?.id || '') === 'acronis') {
       onAcronisDetail();
     } else {
       onViewDetails('product-detail', product);
     }
   };
 
-  const filteredProducts = (actualIntegratedProducts || []).filter(product =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredProducts = (actualIntegratedProducts || []).filter(product => {
+    if (!product) return false;
+    return (product.name || '').toLowerCase().includes((searchTerm || '').toLowerCase());
+  });
 
-  const availableProducts = (availableProductsData || []).filter(p => p.status === 'Available');
+  const availableProducts = (availableProductsData || []).filter(p => (p?.status || '') === 'Available');
 
   const getStatusBadge = (status: string) => {
-    switch (status) {
+    switch (status || '') {
       case 'Available':
         return <Badge className="bg-green-100 text-green-800 hover:bg-green-200">Available</Badge>;
       case 'Integrated':
@@ -197,6 +198,7 @@ export function IntegratedProductsPage({ onViewDetails, onAcronisDetail, onStart
 
           <div className="grid gap-6 lg:grid-cols-2">
             {filteredProducts.map((product) => {
+              if (!product) return null;
               const usagePercentage = getUsagePercentage(product.usedLicenses, product.totalLicenses);
               const daysUntilRenewal = getDaysUntilRenewal(product.renewalDate);
               const IconComponent = getProductIcon(product.name);
@@ -217,15 +219,15 @@ export function IntegratedProductsPage({ onViewDetails, onAcronisDetail, onStart
                           <IconComponent className="w-7 h-7 text-white" />
                         </div>
                         <div>
-                          <h3 className="text-lg font-semibold">{product.name}</h3>
-                          <p className="text-sm text-muted-foreground">{product.licenseType}</p>
+                          <h3 className="text-lg font-semibold">{product.name || 'Unknown Product'}</h3>
+                          <p className="text-sm text-muted-foreground">{product.licenseType || 'Unknown License'}</p>
                         </div>
                       </div>
                       
                       <div className="flex items-center space-x-2">
-                        <Badge variant={getStatusBadgeVariant(product.status)} className="shadow-sm">
+                        <Badge variant={getStatusBadgeVariant(product.status || '')} className="shadow-sm">
                           <CheckCircle className="w-3 h-3 mr-1" />
-                          {product.status}
+                          {product.status || 'Unknown'}
                         </Badge>
                         {isHighUsage && (
                           <Tooltip>
@@ -252,7 +254,7 @@ export function IntegratedProductsPage({ onViewDetails, onAcronisDetail, onStart
                       <div className="space-y-2">
                         <div className="flex justify-between text-sm">
                           <span className="text-muted-foreground">Used</span>
-                          <span className="font-medium">{product.usedLicenses.toLocaleString()} / {product.totalLicenses.toLocaleString()}</span>
+                          <span className="font-medium">{(product.usedLicenses || 0).toLocaleString()} / {(product.totalLicenses || 0).toLocaleString()}</span>
                         </div>
                         <Progress 
                           value={usagePercentage} 
@@ -330,6 +332,7 @@ export function IntegratedProductsPage({ onViewDetails, onAcronisDetail, onStart
           </div>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {availableProducts.map((product) => {
+              if (!product) return null;
               const IconComponent = getCategoryIcon(product.category);
               return (
                 <Card key={product.id} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 group relative overflow-hidden">
@@ -356,15 +359,15 @@ export function IntegratedProductsPage({ onViewDetails, onAcronisDetail, onStart
                         <IconComponent className="w-6 h-6 text-white" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-lg mb-1">{product.name}</h3>
-                        <p className="text-sm text-muted-foreground mb-2">{product.provider}</p>
+                        <h3 className="font-semibold text-lg mb-1">{product.name || 'Unknown Product'}</h3>
+                        <p className="text-sm text-muted-foreground mb-2">{product.provider || 'Unknown Provider'}</p>
                         <Badge variant="outline" className="text-xs">
-                          {product.category}
+                          {product.category || 'Uncategorized'}
                         </Badge>
                       </div>
                     </div>
                     
-                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{product.description}</p>
+                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{product.description || 'No description available'}</p>
                     
                     <div className="space-y-3 mb-4">
                       {product.rating && (
@@ -374,7 +377,7 @@ export function IntegratedProductsPage({ onViewDetails, onAcronisDetail, onStart
                             <span className="text-sm font-medium">{product.rating}</span>
                           </div>
                           <Separator orientation="vertical" className="h-4" />
-                          <span className="text-sm text-muted-foreground">{product.users} users</span>
+                          <span className="text-sm text-muted-foreground">{product.users || '0'} users</span>
                         </div>
                       )}
                       
@@ -389,7 +392,7 @@ export function IntegratedProductsPage({ onViewDetails, onAcronisDetail, onStart
                     <Button 
                       className="w-full shadow-sm hover:shadow-md group-hover:bg-primary/90" 
                       onClick={() => onStartIntegration(product)}
-                      disabled={product.status !== 'Available'}
+                      disabled={(product.status || '') !== 'Available'}
                     >
                       Start Integration
                       <ArrowRight className="w-4 h-4 ml-2" />

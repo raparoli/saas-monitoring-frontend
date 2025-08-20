@@ -35,12 +35,13 @@ export function UserManagementPage() {
   // Filtered users
   const filteredUsers = useMemo(() => {
     return (users || []).filter(user => {
+      if (!user) return false;
       const matchesSearch = 
         (user.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
         (user.email || '').toLowerCase().includes(searchTerm.toLowerCase());
       
-      const matchesRole = roleFilter === 'All' || user.role === roleFilter;
-      const matchesStatus = statusFilter === 'All' || user.status === statusFilter;
+      const matchesRole = roleFilter === 'All' || (user.role || '') === roleFilter;
+      const matchesStatus = statusFilter === 'All' || (user.status || '') === statusFilter;
 
       return matchesSearch && matchesRole && matchesStatus;
     });
@@ -182,30 +183,30 @@ export function UserManagementPage() {
                       <Avatar className="w-8 h-8">
                         <AvatarImage src={u.avatar} />
                         <AvatarFallback className="bg-gray-200 text-gray-700 text-sm">
-                          {getInitials(u.name)}
+                          {getInitials(u.name || '')}
                         </AvatarFallback>
                       </Avatar>
-                      <span className="font-medium">{u.name}</span>
+                      <span className="font-medium">{u.name || 'Unknown User'}</span>
                     </div>
                   </TableCell>
                   <TableCell className="text-sm text-gray-500">
-                    {u.email}
+                    {u.email || 'No email'}
                   </TableCell>
                   <TableCell>
-                    <Badge variant="outline" className={getRoleBadgeColor(u.role)}>
-                      {u.role}
+                    <Badge variant="outline" className={getRoleBadgeColor(u.role || '')}>
+                      {u.role || 'Unknown'}
                     </Badge>
                   </TableCell>
                   <TableCell>
                     <Badge
                       variant="outline"
                       className={
-                        u.status === "Active"
+                        (u.status || '') === "Active"
                           ? "bg-green-50 text-green-700"
                           : "bg-red-50 text-red-700"
                       }
                     >
-                      {u.status}
+                      {u.status || 'Unknown'}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">

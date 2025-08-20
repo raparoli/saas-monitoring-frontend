@@ -8,44 +8,67 @@ export const formatStorageGB = (gb: number): string => {
 };
 
 export const formatDate = (dateString: string): string => {
-  return new Date(dateString).toLocaleDateString('en-US', {
+  if (!dateString || typeof dateString !== 'string') return 'Invalid Date';
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return 'Invalid Date';
+    return date.toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'short',
     day: 'numeric'
   });
+  } catch {
+    return 'Invalid Date';
+  }
 };
 
 export const formatDateTime = (dateString: string): string => {
-  return new Date(dateString).toLocaleString('en-US', {
+  if (!dateString || typeof dateString !== 'string') return 'Invalid Date';
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return 'Invalid Date';
+    return date.toLocaleString('en-US', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit'
   });
+  } catch {
+    return 'Invalid Date';
+  }
 };
 
 export const getInitials = (name: string): string => {
-  if (!name) return 'U';
-  return name.split(' ').map(n => n?.[0] || '').join('').toUpperCase() || 'U';
+  if (!name || typeof name !== 'string') return 'U';
+  const trimmedName = name.trim();
+  if (!trimmedName) return 'U';
+  return trimmedName.split(' ').map(n => n?.[0] || '').join('').toUpperCase() || 'U';
 };
 
 export const getDaysUntilRenewal = (renewalDate: string): number => {
-  if (!renewalDate) return 0;
+  if (!renewalDate || typeof renewalDate !== 'string') return 0;
+  try {
   const renewal = new Date(renewalDate);
+    if (isNaN(renewal.getTime())) return 0;
   const today = new Date();
   const diffTime = renewal.getTime() - today.getTime();
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  } catch {
+    return 0;
+  }
 };
 
 export const getUsagePercentage = (used: number, total: number): number => {
-  if (!total || total === 0) return 0;
-  return Math.round((used / total) * 100);
+  const safeUsed = typeof used === 'number' ? used : 0;
+  const safeTotal = typeof total === 'number' ? total : 0;
+  if (!safeTotal || safeTotal === 0) return 0;
+  return Math.round((safeUsed / safeTotal) * 100);
 };
 
 // Badge variant helpers
 export const getSeverityBadgeVariant = (severity: string) => {
-  switch (severity.toLowerCase()) {
+  switch ((severity || '').toLowerCase()) {
     case 'critical':
     case 'error':
       return 'destructive';
@@ -59,7 +82,7 @@ export const getSeverityBadgeVariant = (severity: string) => {
 };
 
 export const getStatusBadgeVariant = (status: string) => {
-  switch (status.toLowerCase()) {
+  switch ((status || '').toLowerCase()) {
     case 'active':
     case 'enabled':
     case 'connected':
@@ -79,14 +102,15 @@ export const getStatusBadgeVariant = (status: string) => {
 };
 
 export const getUsageBadgeVariant = (percentage: number) => {
-  if (percentage >= 90) return 'destructive';
-  if (percentage >= 75) return 'secondary';
+  const safePercentage = typeof percentage === 'number' ? percentage : 0;
+  if (safePercentage >= 90) return 'destructive';
+  if (safePercentage >= 75) return 'secondary';
   return 'default';
 };
 
 // Color helpers
 export const getRoleBadgeColor = (role: string): string => {
-  switch (role) {
+  switch (role || '') {
     case 'Admin': return 'bg-red-100 text-red-800';
     case 'Analyst': return 'bg-blue-100 text-blue-800';
     case 'Viewer': return 'bg-green-100 text-green-800';
@@ -95,7 +119,7 @@ export const getRoleBadgeColor = (role: string): string => {
 };
 
 export const getEmailStatusColor = (status: string): string => {
-  switch (status) {
+  switch (status || '') {
     case 'Sent': return 'bg-green-100 text-green-800';
     case 'Failed': return 'bg-red-100 text-red-800';
     case 'Pending': return 'bg-yellow-100 text-yellow-800';
@@ -104,7 +128,7 @@ export const getEmailStatusColor = (status: string): string => {
 };
 
 export const getProductBadgeColor = (product: string): string => {
-  switch (product) {
+  switch (product || '') {
     case 'Acronis': return 'bg-blue-100 text-blue-800';
     case 'Microsoft': return 'bg-green-100 text-green-800';
     case 'Bitdefender': return 'bg-orange-100 text-orange-800';
@@ -114,7 +138,7 @@ export const getProductBadgeColor = (product: string): string => {
 };
 
 export const getComplexityColor = (complexity: string): string => {
-  switch (complexity) {
+  switch (complexity || '') {
     case 'Simple': return 'bg-green-100 text-green-800';
     case 'Moderate': return 'bg-yellow-100 text-yellow-800';
     case 'Advanced': return 'bg-red-100 text-red-800';
@@ -123,7 +147,7 @@ export const getComplexityColor = (complexity: string): string => {
 };
 
 export const getProductGradient = (productId: string): string => {
-  switch (productId) {
+  switch (productId || '') {
     case 'acronis':
       return 'bg-gradient-to-br from-orange-50 to-red-100 border-orange-200';
     case 'microsoft':

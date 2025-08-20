@@ -60,16 +60,17 @@ export function AlertManagementPage() {
   // Filtered data
   const filteredAlerts = useMemo(() => {
     return (alerts || []).filter(alert => {
+      if (!alert) return false;
       const matchesSearch = 
         (alert.customerName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
         (alert.resourceName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
         (alert.alertId || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
         (alert.productName || '').toLowerCase().includes(searchTerm.toLowerCase());
       
-      const matchesSeverity = severityFilter === 'all' || alert.severity === severityFilter;
-      const matchesCategory = categoryFilter === 'all' || alert.category === categoryFilter;
-      const matchesEmailStatus = emailStatusFilter === 'all' || alert.emailStatus === emailStatusFilter;
-      const matchesProduct = productFilter === 'all' || alert.productName === productFilter;
+      const matchesSeverity = severityFilter === 'all' || (alert.severity || '') === severityFilter;
+      const matchesCategory = categoryFilter === 'all' || (alert.category || '') === categoryFilter;
+      const matchesEmailStatus = emailStatusFilter === 'all' || (alert.emailStatus || '') === emailStatusFilter;
+      const matchesProduct = productFilter === 'all' || (alert.productName || '') === productFilter;
 
       return matchesSearch && matchesSeverity && matchesCategory && matchesEmailStatus && matchesProduct;
     });
@@ -86,12 +87,14 @@ export function AlertManagementPage() {
   const summaryStats = useMemo(() => {
     const alertsArray = alerts || [];
     const totalEmailed = alertsArray.length;
-    const failedEmails = alertsArray.filter(a => a.emailStatus === 'Failed').length;
-    const criticalSent = alertsArray.filter(a => a.severity === 'Critical' && a.emailStatus === 'Sent').length;
+    const failedEmails = alertsArray.filter(a => (a?.emailStatus || '') === 'Failed').length;
+    const criticalSent = alertsArray.filter(a => (a?.severity || '') === 'Critical' && (a?.emailStatus || '') === 'Sent').length;
     
     // Most common alert type
     const alertTypeCounts = alertsArray.reduce((acc, alert) => {
-      acc[alert.alertType] = (acc[alert.alertType] || 0) + 1;
+      if (alert?.alertType) {
+        acc[alert.alertType] = (acc[alert.alertType] || 0) + 1;
+      }
       return acc;
     }, {} as Record<string, number>);
     const mostCommonAlertType = Object.entries(alertTypeCounts)
@@ -99,7 +102,9 @@ export function AlertManagementPage() {
 
     // Most affected category
     const categoryCounts = alertsArray.reduce((acc, alert) => {
-      acc[alert.category] = (acc[alert.category] || 0) + 1;
+      if (alert?.category) {
+        acc[alert.category] = (acc[alert.category] || 0) + 1;
+      }
       return acc;
     }, {} as Record<string, number>);
     const mostAffectedCategory = Object.entries(categoryCounts)
@@ -377,6 +382,7 @@ export function AlertManagementPage() {
               </TableHeader>
               <TableBody>
                 {paginatedAlerts.map((alert) => {
+                  if (!alert) return null;
                   const StatusIcon = getStatusIcon(alert.emailStatus);
                   return (
                     <TableRow 
@@ -385,36 +391,36 @@ export function AlertManagementPage() {
                       onClick={() => handleViewDetails(alert)}
                     >
                       <TableCell className="font-mono text-sm">
-                        {alert.alertId}
+                        {alert.alertId || 'Unknown'}
                       </TableCell>
                       <TableCell>
-                        <Badge className={getProductBadgeColor(alert.productName)}>
-                          {alert.productName}
+                        <Badge className={getProductBadgeColor(alert.productName || '')}>
+                          {alert.productName || 'Unknown'}
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <Badge variant={getSeverityBadgeVariant(alert.severity)}>
-                          {alert.severity}
+                        <Badge variant={getSeverityBadgeVariant(alert.severity || '')}>
+                          {alert.severity || 'Unknown'}
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline">{alert.category}</Badge>
+                        <Badge variant="outline">{alert.category || 'Unknown'}</Badge>
                       </TableCell>
                       <TableCell className="font-medium">
-                        {alert.alertType}
+                        {alert.alertType || 'Unknown'}
                       </TableCell>
-                      <TableCell>{alert.customerName}</TableCell>
+                      <TableCell>{alert.customerName || 'Unknown'}</TableCell>
                       <TableCell className="max-w-xs truncate font-mono text-sm">
-                        {alert.resourceName}
+                        {alert.resourceName || 'Unknown'}
                       </TableCell>
                       <TableCell className="text-sm">
-                        {formatDateTime(alert.emailSentAt)}
+                        {alert.emailSentAt ? formatDateTime(alert.emailSentAt) : 'Unknown'}
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center space-x-2">
                           <StatusIcon className="w-4 h-4" />
-                          <Badge className={getEmailStatusColor(alert.emailStatus)}>
-                            {alert.emailStatus}
+                          <Badge className={getEmailStatusColor(alert.emailStatus || '')}>
+                            {alert.emailStatus || 'Unknown'}
                           </Badge>
                         </div>
                       </TableCell>
@@ -492,45 +498,45 @@ export function AlertManagementPage() {
                       <div className="space-y-3">
                         <div>
                           <p className="text-sm font-medium text-muted-foreground">Alert ID</p>
-                          <p className="font-mono">{selectedAlert.alertId}</p>
+                          <p className="font-mono">{selectedAlert.alertId || 'Unknown'}</p>
                         </div>
                         <div>
                           <p className="text-sm font-medium text-muted-foreground">Product</p>
-                          <Badge className={getProductBadgeColor(selectedAlert.productName)}>
-                            {selectedAlert.productName}
+                          <Badge className={getProductBadgeColor(selectedAlert.productName || '')}>
+                            {selectedAlert.productName || 'Unknown'}
                           </Badge>
                         </div>
                         <div>
                           <p className="text-sm font-medium text-muted-foreground">Severity</p>
-                          <Badge variant={getSeverityBadgeVariant(selectedAlert.severity)}>
-                            {selectedAlert.severity}
+                          <Badge variant={getSeverityBadgeVariant(selectedAlert.severity || '')}>
+                            {selectedAlert.severity || 'Unknown'}
                           </Badge>
                         </div>
                         <div>
                           <p className="text-sm font-medium text-muted-foreground">Category</p>
-                          <Badge variant="outline">{selectedAlert.category}</Badge>
+                          <Badge variant="outline">{selectedAlert.category || 'Unknown'}</Badge>
                         </div>
                         <div>
                           <p className="text-sm font-medium text-muted-foreground">Alert Type</p>
-                          <p>{selectedAlert.alertType}</p>
+                          <p>{selectedAlert.alertType || 'Unknown'}</p>
                         </div>
                       </div>
                       <div className="space-y-3">
                         <div>
                           <p className="text-sm font-medium text-muted-foreground">Customer</p>
-                          <p>{selectedAlert.customerName}</p>
+                          <p>{selectedAlert.customerName || 'Unknown'}</p>
                         </div>
                         <div>
                           <p className="text-sm font-medium text-muted-foreground">Email Address</p>
-                          <p className="font-mono text-sm">{selectedAlert.customerEmail}</p>
+                          <p className="font-mono text-sm">{selectedAlert.customerEmail || 'Unknown'}</p>
                         </div>
                         <div>
                           <p className="text-sm font-medium text-muted-foreground">Resource</p>
-                          <p className="font-mono text-sm">{selectedAlert.resourceName}</p>
+                          <p className="font-mono text-sm">{selectedAlert.resourceName || 'Unknown'}</p>
                         </div>
                         <div>
                           <p className="text-sm font-medium text-muted-foreground">Plan</p>
-                          <p>{selectedAlert.planName}</p>
+                          <p>{selectedAlert.planName || 'Unknown'}</p>
                         </div>
                       </div>
                     </div>
@@ -547,13 +553,13 @@ export function AlertManagementPage() {
                       <div className="space-y-3">
                         <div>
                           <p className="text-sm font-medium text-muted-foreground">Email Sent At</p>
-                          <p>{formatDateTime(selectedAlert.emailSentAt)}</p>
+                          <p>{selectedAlert.emailSentAt ? formatDateTime(selectedAlert.emailSentAt) : 'Unknown'}</p>
                         </div>
                         <div>
                           <p className="text-sm font-medium text-muted-foreground">Delivery Status</p>
                           <div className="flex items-center space-x-2">
-                            <Badge className={getEmailStatusColor(selectedAlert.emailStatus)}>
-                              {selectedAlert.emailStatus}
+                            <Badge className={getEmailStatusColor(selectedAlert.emailStatus || '')}>
+                              {selectedAlert.emailStatus || 'Unknown'}
                             </Badge>
                           </div>
                         </div>
@@ -561,12 +567,12 @@ export function AlertManagementPage() {
                       <div className="space-y-3">
                         <div>
                           <p className="text-sm font-medium text-muted-foreground">Delivery Attempts</p>
-                          <p>{selectedAlert.deliveryAttempts}</p>
+                          <p>{selectedAlert.deliveryAttempts || 0}</p>
                         </div>
                         {selectedAlert.lastAttempt && (
                           <div>
                             <p className="text-sm font-medium text-muted-foreground">Last Attempt</p>
-                            <p>{formatDateTime(selectedAlert.lastAttempt)}</p>
+                            <p>{selectedAlert.lastAttempt ? formatDateTime(selectedAlert.lastAttempt) : 'Unknown'}</p>
                           </div>
                         )}
                       </div>
@@ -574,7 +580,7 @@ export function AlertManagementPage() {
                     {selectedAlert.errorMessage && (
                       <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
                         <p className="text-sm font-medium text-red-800">Error Message</p>
-                        <p className="text-sm text-red-700 mt-1">{selectedAlert.errorMessage}</p>
+                        <p className="text-sm text-red-700 mt-1">{selectedAlert.errorMessage || 'No error details'}</p>
                       </div>
                     )}
                   </CardContent>
@@ -587,7 +593,7 @@ export function AlertManagementPage() {
                   </CardHeader>
                   <CardContent>
                     <div className="p-4 bg-gray-50 rounded-lg">
-                      <p className="text-sm">{selectedAlert.message}</p>
+                      <p className="text-sm">{selectedAlert.message || 'No message available'}</p>
                     </div>
                   </CardContent>
                 </Card>
@@ -603,7 +609,7 @@ export function AlertManagementPage() {
                         </p>
                       </div>
                       <div className="flex items-center space-x-3">
-                        {selectedAlert.emailStatus === 'Failed' && (
+                        {(selectedAlert.emailStatus || '') === 'Failed' && (
                           <Button size="sm">
                             <Mail className="w-4 h-4 mr-2" />
                             Resend Email
